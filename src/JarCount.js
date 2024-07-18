@@ -35,7 +35,7 @@ const Dashboard = () => {
 
         const fetchAllJarCounts = async () => {
             let jarCounts = [];
-            let nextPageUrl = `/api/jarcounts/?date=${date}`;
+            let nextPageUrl = `https://t3nbnutty.netlify.app/api/jarcounts/?date=${date}`;
             console.log("Starting pagination fetch");
 
             while (nextPageUrl) {
@@ -59,7 +59,7 @@ const Dashboard = () => {
         };
 
         const fetchInventory = async () => {
-            const response = await fetch(`http://3.21.185.97:8000/api/inventories/`);
+            const response = await fetch(`/api/inventories/`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
