@@ -30,7 +30,7 @@ const InputInventory = () => {
 
         try {
             for (const item of formattedInventory) {
-                const response = await fetch('http://3.21.185.97:8000/api/inventories/', {
+                const response = await fetch('/api/inventories/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
