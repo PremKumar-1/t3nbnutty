@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import useWebSocket, { ReadyState } from 'use-websocket';
+import io from 'socket.io-client';
 import './JarCount.css';
 import Speedometer from './Speedometer';
+
+const socket = io(`ws://3.21.185.97:8000/ws/jarcounts/`);
 
 const Dashboard = () => {
     const getCurrentDate = () => {
@@ -17,21 +19,16 @@ const Dashboard = () => {
     const [inventory, setInventory] = useState([]);
     const [jarsPerHour, setJarsPerHour] = useState(0);
 
-    // WebSocket URL
-    const socketUrl = `ws://3.21.185.97/ws/jarcounts/`;
+    useEffect(() => {
+        socket.on('jarCountUpdate', () => {
+            fetchData();
+        });
 
-    // Use the useWebSocket hook
-    const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
-        onOpen: () => console.log('WebSocket connection established'),
-        onMessage: (event) => {
-            const data = JSON.parse(event.data);
-            if (data.message) {
-                fetchData();
-            }
-        },
-        onError: (error) => console.error('WebSocket error:', error),
-        shouldReconnect: (closeEvent) => true, // Reconnect on close
-    });
+        // Cleanup the socket connection on unmount
+        return () => {
+            socket.off('jarCountUpdate');
+        };
+    }, []);
 
     const fetchData = async () => {
         try {
@@ -48,7 +45,6 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        // Initial fetch
         fetchData();
     }, [date]);
 
@@ -99,14 +95,6 @@ const Dashboard = () => {
         setDate(e.target.value);
     };
 
-    const connectionStatus = {
-        [ReadyState.CONNECTING]: 'Connecting',
-        [ReadyState.OPEN]: 'Open',
-        [ReadyState.CLOSING]: 'Closing',
-        [ReadyState.CLOSED]: 'Closed',
-        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-    }[readyState];
-
     return (
         <div className="dashboard">
             <h1>Jar Counter Dashboard</h1>
@@ -141,30 +129,6 @@ const Dashboard = () => {
                     </tr>
                 </tbody>
             </table>
-            <h2>Inventory</h2>
-            <table className="data-table">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Quantity</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Array.isArray(inventory) && inventory.length > 0 ? (
-                        inventory.map((item, index) => (
-                            <tr key={index}>
-                                <td>{item.product_name ? item.product_name.trim() : 'Unknown'}</td>
-                                <td>{item.quantity.toFixed(2)}</td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="2">No inventory data available</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-            <div>WebSocket connection status: {connectionStatus}</div>
         </div>
     );
 };
