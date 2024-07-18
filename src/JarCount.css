@@ -63,3 +63,11 @@ label {
         padding: 6px;
     }
 }
+
+.data-table td {
+    transition: all 0.3s ease-in-out;
+}
+
+.data-table td.loading {
+    opacity: 0.5;
+}
