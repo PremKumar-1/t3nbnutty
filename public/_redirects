@@ -1,1 +1,1 @@
-/api/* http://3.21.185.97/api/:splat 200
+/api/* http://3.21.185.97:8000/api/:splat 200
