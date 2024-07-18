@@ -21,10 +21,10 @@ const Dashboard = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const jarCountPromise = fetchAllJarCounts();
-                const inventoryPromise = fetchInventory();
+                const [jarCounts, inventoryData] = await Promise.all([fetchAllJarCounts(), fetchInventory()]);
 
-                await Promise.all([jarCountPromise, inventoryPromise]);
+                processJarCounts(jarCounts);
+                setInventory(inventoryData);
 
                 setLoading(false);
             } catch (error) {
@@ -36,7 +36,7 @@ const Dashboard = () => {
         const fetchAllJarCounts = async () => {
             let jarCounts = [];
             let nextPageUrl = `/api/jarcounts/?date=${date}`;
-            
+
             while (nextPageUrl) {
                 const response = await fetch(nextPageUrl);
                 if (!response.ok) {
@@ -47,6 +47,19 @@ const Dashboard = () => {
                 nextPageUrl = data.next;
             }
 
+            return jarCounts;
+        };
+
+        const fetchInventory = async () => {
+            const response = await fetch(`/api/inventories/`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            return data.results;
+        };
+
+        const processJarCounts = (jarCounts) => {
             const shift1 = jarCounts.filter(count => count.shift === 'day').length;
             const shift2 = jarCounts.filter(count => count.shift === 'night').length;
             const total = shift1 + shift2;
@@ -55,26 +68,6 @@ const Dashboard = () => {
             const hoursWorked = 12;
             const jarsPerHour = total / hoursWorked;
             setJarsPerHour(isNaN(jarsPerHour) ? 0 : jarsPerHour);
-        };
-
-        const fetchInventory = async () => {
-            try {
-                const response = await fetch(`/api/inventories/`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                const inventoryData = data.results;
-                if (Array.isArray(inventoryData)) {
-                    setInventory(inventoryData);
-                } else {
-                    console.error("Error: Inventory data is not an array", data);
-                    setInventory([]);
-                }
-            } catch (error) {
-                console.error("Error fetching inventory:", error);
-                setInventory([]);
-            }
         };
 
         fetchData();
