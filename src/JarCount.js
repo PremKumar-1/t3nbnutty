@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import React, { useEffect, useState, useCallback } from 'react';
+import { io } from 'socket.io-client';
 import './JarCount.css';
 import Speedometer from './Speedometer';
 
@@ -19,18 +19,7 @@ const Dashboard = () => {
     const [inventory, setInventory] = useState([]);
     const [jarsPerHour, setJarsPerHour] = useState(0);
 
-    useEffect(() => {
-        socket.on('jarCountUpdate', () => {
-            fetchData();
-        });
-
-        // Cleanup the socket connection on unmount
-        return () => {
-            socket.off('jarCountUpdate');
-        };
-    }, [fetchData]);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const [jarCounts, inventoryData] = await Promise.all([
                 fetchAllJarCounts(date), 
@@ -42,7 +31,18 @@ const Dashboard = () => {
         } catch (error) {
             console.error("Error fetching data:", error);
         }
-    };
+    }, [date]);
+
+    useEffect(() => {
+        socket.on('jarCountUpdate', () => {
+            fetchData();
+        });
+
+        // Cleanup the socket connection on unmount
+        return () => {
+            socket.off('jarCountUpdate');
+        };
+    }, [fetchData]);
 
     useEffect(() => {
         fetchData();
