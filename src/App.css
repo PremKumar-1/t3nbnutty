@@ -13,6 +13,17 @@
   }
 }
 
+.content {
+  padding-top: 60px; /* Adjust padding to prevent overlap with the fixed navbar */
+}
+
+@media (max-width: 600px) {
+  .content {
+      padding-top: 80px; /* Additional padding for mobile view */
+  }
+}
+
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

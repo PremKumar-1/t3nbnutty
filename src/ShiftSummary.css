@@ -1,0 +1,15 @@
+.shift-summary {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.shift-summary h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.shift-summary canvas {
+    max-width: 100%;
+    height: auto;
+}
