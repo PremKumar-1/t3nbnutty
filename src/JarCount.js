@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import './JarCount.css';
 import Speedometer from './Speedometer';
 
-const socket = io(`ws://3.21.185.97:8000/ws/jarcounts/`);
+const socket = io('http://3.21.185.97:8000');
 
 const Dashboard = () => {
     const getCurrentDate = () => {
@@ -28,7 +28,7 @@ const Dashboard = () => {
         return () => {
             socket.off('jarCountUpdate');
         };
-    }, []);
+    }, [fetchData]);
 
     const fetchData = async () => {
         try {
@@ -46,7 +46,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchData();
-    }, [date]);
+    }, [date, fetchData]);
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
@@ -127,6 +127,29 @@ const Dashboard = () => {
                         <td>Total</td>
                         <td>{jarCount.total}</td>
                     </tr>
+                </tbody>
+            </table>
+            <h2>Inventory</h2>
+            <table className="data-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {Array.isArray(inventory) && inventory.length > 0 ? (
+                        inventory.map((item, index) => (
+                            <tr key={index}>
+                                <td>{item.product_name ? item.product_name.trim() : 'Unknown'}</td>
+                                <td>{item.quantity.toFixed(2)}</td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="2">No inventory data available</td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
         </div>
