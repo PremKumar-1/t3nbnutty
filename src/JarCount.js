@@ -41,6 +41,11 @@ const Dashboard = () => {
             while (nextPageUrl) {
                 console.log(`Fetching: ${nextPageUrl}`);
                 try {
+                    // Ensure the URL uses HTTPS
+                    if (nextPageUrl.startsWith('http://')) {
+                        nextPageUrl = nextPageUrl.replace('http://', 'https://');
+                    }
+
                     const response = await fetch(nextPageUrl);
                     if (!response.ok) {
                         throw new Error(`Network response was not ok for URL: ${nextPageUrl}`);
@@ -48,7 +53,12 @@ const Dashboard = () => {
                     const data = await response.json();
                     console.log(`Data fetched from ${nextPageUrl}:`, data);
                     jarCounts = jarCounts.concat(data.results);
-                    nextPageUrl = data.next;
+                    nextPageUrl = data.next; // Update nextPageUrl to the next page URL
+
+                    // Ensure the next page URL uses HTTPS
+                    if (nextPageUrl && nextPageUrl.startsWith('http://')) {
+                        nextPageUrl = nextPageUrl.replace('http://', 'https://');
+                    }
                 } catch (error) {
                     console.error(`Error fetching page: ${nextPageUrl}`, error);
                     break; // Exit loop on error
