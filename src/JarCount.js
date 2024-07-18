@@ -97,7 +97,6 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard">
-            <h1>Jar Counter Dashboard</h1>
             <label htmlFor="date-picker">Select Date:</label>
             <input 
                 type="date" 
@@ -106,43 +105,43 @@ const Dashboard = () => {
                 onChange={handleDateChange} 
             />
             <Speedometer value={jarsPerHour} />
-            <h2>Main Room Jar Count (RITA)</h2>
+            <h1>Main Room Jar Count (RITA)</h1>
             <table className="data-table">
                 <thead>
                     <tr>
-                        <th>Shift</th>
-                        <th>Completed</th>
+                        <th><h2>Shift</h2></th>
+                        <th><h2>Completed</h2></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td> <h3>Shift 1</h3></td>
+                        <td className="number-cell">Shift 1</td>
                         <td className="number-cell">{jarCount.shift1}</td>
                     </tr>
                     <tr>
-                        <td>Shift 2</td>
+                        <td className="number-cell">Shift 2</td>
                         <td className="number-cell">{jarCount.shift2}</td>
                     </tr>
                     <tr>
-                        <td>Total</td>
+                        <td className="number-cell">Total</td>
                         <td className="number-cell">{jarCount.total}</td>
                     </tr>
                 </tbody>
             </table>
 
-            <h2>Inventory</h2>
+            <h1>Inventory</h1>
             <table className="data-table">
                 <thead>
                     <tr>
-                        <th>Item</th>
-                        <th>Quantity</th>
+                        <th><h2>Item</h2></th>
+                        <th><h2>Quantity</h2></th>
                     </tr>
                 </thead>
                 <tbody>
                     {Array.isArray(inventory) && inventory.length > 0 ? (
                         inventory.map((item, index) => (
                             <tr key={index}>
-                                <td>{item.product_name ? item.product_name.trim() : 'Unknown'}</td>
+                                <td className="number-cell">{item.product_name ? item.product_name.trim() : 'Unknown'}</td>
                                 <td className="number-cell">{item.quantity.toFixed(2)}</td>
                             </tr>
                         ))
