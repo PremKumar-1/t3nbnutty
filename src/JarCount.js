@@ -1,9 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { io } from 'socket.io-client';
+import React, { useEffect, useState } from 'react';
 import './JarCount.css';
 import Speedometer from './Speedometer';
-
-const socket = io('http://3.21.185.97:8000');
 
 const Dashboard = () => {
     const getCurrentDate = () => {
@@ -19,34 +16,24 @@ const Dashboard = () => {
     const [inventory, setInventory] = useState([]);
     const [jarsPerHour, setJarsPerHour] = useState(0);
 
-    const fetchData = useCallback(async () => {
-        try {
-            const [jarCounts, inventoryData] = await Promise.all([
-                fetchAllJarCounts(date), 
-                fetchInventory()
-            ]);
-
-            processJarCounts(jarCounts);
-            setInventory(inventoryData);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    }, [date]);
-
     useEffect(() => {
-        socket.on('jarCountUpdate', () => {
-            fetchData();
-        });
+        const fetchData = async () => {
+            try {
+                const [jarCounts, inventoryData] = await Promise.all([
+                    fetchAllJarCounts(date), 
+                    fetchInventory()
+                ]);
 
-        // Cleanup the socket connection on unmount
-        return () => {
-            socket.off('jarCountUpdate');
+                processJarCounts(jarCounts);
+                setInventory(inventoryData);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         };
-    }, [fetchData]);
 
-    useEffect(() => {
+        // Initial fetch
         fetchData();
-    }, [date, fetchData]);
+    }, [date]);
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
