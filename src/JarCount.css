@@ -62,6 +62,14 @@ label {
         font-size: 14px;
         padding: 6px;
     }
+
+    .number-cell {
+        font-size: 1.2em; /* Adjust this value as needed */
+    }
+}
+
+.number-cell {
+    font-size: 1.5em; /* Default value for larger screens */
 }
 
 .data-table td {
@@ -70,8 +78,4 @@ label {
 
 .data-table td.loading {
     opacity: 0.5;
-}
-
-.number-cell {
-    font-size: 1.5em; /* Adjust this value as needed */
 }
