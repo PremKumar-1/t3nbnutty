@@ -13,9 +13,7 @@ const Dashboard = () => {
 
     const [date, setDate] = useState(getCurrentDate());
     const [jarCount, setJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
-    const [tempJarCount, setTempJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
     const [inventory, setInventory] = useState([]);
-    const [tempInventory, setTempInventory] = useState([]);
     const [jarsPerHour, setJarsPerHour] = useState(0);
 
     useEffect(() => {
@@ -26,8 +24,8 @@ const Dashboard = () => {
                     fetchInventory()
                 ]);
 
-                processJarCounts(jarCounts, setTempJarCount, setJarsPerHour);
-                setTempInventory(inventoryData);
+                processJarCounts(jarCounts);
+                setInventory(inventoryData);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -35,18 +33,7 @@ const Dashboard = () => {
 
         // Initial fetch
         fetchData();
-
-        // Set interval for continuous fetching
-        const intervalId = setInterval(fetchData, 5000); // Fetch data every 5 seconds
-
-        // Clear interval on component unmount
-        return () => clearInterval(intervalId);
     }, [date]);
-
-    useEffect(() => {
-        setJarCount(tempJarCount);
-        setInventory(tempInventory);
-    }, [tempJarCount, tempInventory]);
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
@@ -80,7 +67,7 @@ const Dashboard = () => {
         return data.results;
     };
 
-    const processJarCounts = (jarCounts, setJarCount, setJarsPerHour) => {
+    const processJarCounts = (jarCounts) => {
         const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
         const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
