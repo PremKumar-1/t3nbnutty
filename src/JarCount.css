@@ -80,7 +80,7 @@ label {
     }
 
     .number-cell {
-        font-size: 2em; /* Increase font size for mobile */
+        font-size: 10em; /* Increase font size for mobile */
     }
 }
 
