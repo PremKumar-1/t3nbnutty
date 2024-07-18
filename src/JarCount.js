@@ -36,27 +36,27 @@ const Dashboard = () => {
         const fetchAllJarCounts = async () => {
             let jarCounts = [];
             let nextPageUrl = `/api/jarcounts/?date=${date}`;
-            console.log("Starting pagination fetch");
-
+            const baseUrl = window.location.origin; // Get the base URL of the current domain
+        
             while (nextPageUrl) {
-                console.log(`Fetching: ${nextPageUrl}`);
                 try {
-                    const response = await fetch(nextPageUrl);
+                    const response = await fetch(nextPageUrl.startsWith('http') ? nextPageUrl : baseUrl + nextPageUrl);
                     if (!response.ok) {
                         throw new Error(`Network response was not ok for URL: ${nextPageUrl}`);
                     }
                     const data = await response.json();
                     console.log(`Data fetched from ${nextPageUrl}:`, data);
                     jarCounts = jarCounts.concat(data.results);
-                    nextPageUrl = data.next;
+                    nextPageUrl = data.next ? (data.next.startsWith('http') ? data.next : `${baseUrl}${data.next}`) : null;
                 } catch (error) {
                     console.error(`Error fetching page: ${nextPageUrl}`, error);
                     break; // Exit loop on error
                 }
             }
-
+        
             return jarCounts;
         };
+        
 
         const fetchInventory = async () => {
             const response = await fetch(`/api/inventories/`);
