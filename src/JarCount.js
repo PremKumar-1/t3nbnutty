@@ -36,33 +36,25 @@ const Dashboard = () => {
         const fetchAllJarCounts = async () => {
             let jarCounts = [];
             let nextPageUrl = `/api/jarcounts/?date=${date}`;
-            const baseUrl = window.location.origin; // Get the base URL of the current domain
-        
+            const baseUrl = window.location.origin;
             while (nextPageUrl) {
                 try {
                     const response = await fetch(nextPageUrl.startsWith('http') ? nextPageUrl : baseUrl + nextPageUrl);
-                    if (!response.ok) {
-                        throw new Error(`Network response was not ok for URL: ${nextPageUrl}`);
-                    }
+                    if (!response.ok) throw new Error(`Network response was not ok for URL: ${nextPageUrl}`);
                     const data = await response.json();
-                    console.log(`Data fetched from ${nextPageUrl}:`, data);
                     jarCounts = jarCounts.concat(data.results);
                     nextPageUrl = data.next ? (data.next.startsWith('http') ? data.next : `${baseUrl}${data.next}`) : null;
                 } catch (error) {
                     console.error(`Error fetching page: ${nextPageUrl}`, error);
-                    break; // Exit loop on error
+                    break;
                 }
             }
-        
             return jarCounts;
         };
-        
 
         const fetchInventory = async () => {
             const response = await fetch(`/api/inventories/`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
             return data.results;
         };
@@ -72,13 +64,16 @@ const Dashboard = () => {
             const shift2 = jarCounts.filter(count => count.shift === 'night').length;
             const total = shift1 + shift2;
             setJarCount({ shift1, shift2, total });
-
             const hoursWorked = 12;
             const jarsPerHour = total / hoursWorked;
             setJarsPerHour(isNaN(jarsPerHour) ? 0 : jarsPerHour);
         };
 
         fetchData();
+
+        const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
+
+        return () => clearInterval(interval); // Cleanup on component unmount
     }, [date]);
 
     const handleDateChange = (e) => {
@@ -89,12 +84,7 @@ const Dashboard = () => {
         <div className="dashboard">
             <h1>Jar Counter Dashboard</h1>
             <label htmlFor="date-picker">Select Date:</label>
-            <input 
-                type="date" 
-                id="date-picker" 
-                value={date}
-                onChange={handleDateChange} 
-            />
+            <input type="date" id="date-picker" value={date} onChange={handleDateChange} />
             {loading ? (
                 <p>Loading...</p>
             ) : (
