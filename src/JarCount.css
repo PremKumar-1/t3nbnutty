@@ -53,7 +53,23 @@ label {
     font-weight: bold;
 }
 
-@media (max-width: 1500px) {
+.number-cell {
+    font-size: 1.5em; /* Default value for larger screens */
+}
+
+@media (max-width: 1200px) {
+    .number-cell {
+        font-size: 1.3em; /* Adjust this value as needed */
+    }
+}
+
+@media (max-width: 900px) {
+    .number-cell {
+        font-size: 1.1em; /* Adjust this value as needed */
+    }
+}
+
+@media (max-width: 600px) {
     #date-picker {
         width: 100%;
     }
@@ -64,12 +80,8 @@ label {
     }
 
     .number-cell {
-        font-size: 2em; /* Adjust this value as needed */
+        font-size: 2em; /* Increase font size for mobile */
     }
-}
-
-.number-cell {
-    font-size: 1.5em; /* Default value for larger screens */
 }
 
 .data-table td {
