@@ -35,7 +35,7 @@ const Dashboard = () => {
 
         const fetchAllJarCounts = async () => {
             let jarCounts = [];
-            let nextPageUrl = `http://3.21.185.97:8000/api/jarcounts/?date=${date}`;
+            let nextPageUrl = `/api/jarcounts/?date=${date}`;
             
             while (nextPageUrl) {
                 const response = await fetch(nextPageUrl);
@@ -59,7 +59,7 @@ const Dashboard = () => {
 
         const fetchInventory = async () => {
             try {
-                const response = await fetch(`http://3.21.185.97:8000/api/inventories/`);
+                const response = await fetch(`/api/inventories/`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
