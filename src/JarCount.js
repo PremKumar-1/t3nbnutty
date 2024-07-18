@@ -35,20 +35,20 @@ const Dashboard = () => {
 
         const fetchAllJarCounts = async () => {
             let jarCounts = [];
-            //let nextPageUrl = `/api/jarcounts/?date=${date}`;
-            let nextPageUrl = `/api/jarcounts/?`;
+            let nextPageUrl = `/api/jarcounts/?date=${date}`;
             console.log("Starting pagination fetch");
 
             while (nextPageUrl) {
+                console.log(`Fetching: ${nextPageUrl}`);
                 try {
                     const response = await fetch(nextPageUrl);
                     if (!response.ok) {
                         throw new Error(`Network response was not ok for URL: ${nextPageUrl}`);
                     }
                     const data = await response.json();
+                    console.log(`Data fetched from ${nextPageUrl}:`, data);
                     jarCounts = jarCounts.concat(data.results);
                     nextPageUrl = data.next;
-                    console.log(`Fetched page, nextPageUrl: ${nextPageUrl}`);
                 } catch (error) {
                     console.error(`Error fetching page: ${nextPageUrl}`, error);
                     break; // Exit loop on error
