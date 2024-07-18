@@ -13,30 +13,23 @@ const Dashboard = () => {
 
     const [date, setDate] = useState(getCurrentDate());
     const [jarCount, setJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
+    const [tempJarCount, setTempJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
     const [inventory, setInventory] = useState([]);
+    const [tempInventory, setTempInventory] = useState([]);
     const [jarsPerHour, setJarsPerHour] = useState(0);
-    const [loadingJarCount, setLoadingJarCount] = useState(false);
-    const [loadingInventory, setLoadingInventory] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoadingJarCount(true);
-            setLoadingInventory(true);
             try {
                 const [jarCounts, inventoryData] = await Promise.all([
                     fetchAllJarCounts(date), 
                     fetchInventory()
                 ]);
 
-                processJarCounts(jarCounts);
-                setInventory(inventoryData);
-
-                setLoadingJarCount(false);
-                setLoadingInventory(false);
+                processJarCounts(jarCounts, setTempJarCount, setJarsPerHour);
+                setTempInventory(inventoryData);
             } catch (error) {
                 console.error("Error fetching data:", error);
-                setLoadingJarCount(false);
-                setLoadingInventory(false);
             }
         };
 
@@ -49,6 +42,11 @@ const Dashboard = () => {
         // Clear interval on component unmount
         return () => clearInterval(intervalId);
     }, [date]);
+
+    useEffect(() => {
+        setJarCount(tempJarCount);
+        setInventory(tempInventory);
+    }, [tempJarCount, tempInventory]);
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
@@ -82,7 +80,7 @@ const Dashboard = () => {
         return data.results;
     };
 
-    const processJarCounts = (jarCounts) => {
+    const processJarCounts = (jarCounts, setJarCount, setJarsPerHour) => {
         const shift1 = jarCounts.filter(count => count.shift === 'day').length;
         const shift2 = jarCounts.filter(count => count.shift === 'night').length;
         const total = shift1 + shift2;
@@ -119,15 +117,15 @@ const Dashboard = () => {
                 <tbody>
                     <tr>
                         <td>Shift 1</td>
-                        <td>{loadingJarCount ? 'Loading...' : jarCount.shift1}</td>
+                        <td>{jarCount.shift1}</td>
                     </tr>
                     <tr>
                         <td>Shift 2</td>
-                        <td>{loadingJarCount ? 'Loading...' : jarCount.shift2}</td>
+                        <td>{jarCount.shift2}</td>
                     </tr>
                     <tr>
                         <td>Total</td>
-                        <td>{loadingJarCount ? 'Loading...' : jarCount.total}</td>
+                        <td>{jarCount.total}</td>
                     </tr>
                 </tbody>
             </table>
@@ -140,17 +138,17 @@ const Dashboard = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {loadingInventory ? (
-                        <tr>
-                            <td colSpan="2">Loading...</td>
-                        </tr>
-                    ) : (
+                    {Array.isArray(inventory) && inventory.length > 0 ? (
                         inventory.map((item, index) => (
                             <tr key={index}>
                                 <td>{item.product_name ? item.product_name.trim() : 'Unknown'}</td>
                                 <td>{item.quantity.toFixed(2)}</td>
                             </tr>
                         ))
+                    ) : (
+                        <tr>
+                            <td colSpan="2">No inventory data available</td>
+                        </tr>
                     )}
                 </tbody>
             </table>
