@@ -40,7 +40,14 @@ const Dashboard = () => {
             }
         };
 
+        // Initial fetch
         fetchData();
+
+        // Set interval for continuous fetching
+        const intervalId = setInterval(fetchData, 5000); // Fetch data every 5 seconds
+
+        // Clear interval on component unmount
+        return () => clearInterval(intervalId);
     }, [date]);
 
     const fetchAllJarCounts = async (selectedDate) => {
