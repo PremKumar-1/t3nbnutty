@@ -116,7 +116,7 @@ const Dashboard = () => {
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Shift 1</td>
+                        <td> <h3>Shift 1</h3></td>
                         <td className="number-cell">{jarCount.shift1}</td>
                     </tr>
                     <tr>
@@ -143,7 +143,7 @@ const Dashboard = () => {
                         inventory.map((item, index) => (
                             <tr key={index}>
                                 <td>{item.product_name ? item.product_name.trim() : 'Unknown'}</td>
-                                <td>{item.quantity.toFixed(2)}</td>
+                                <td className="number-cell">{item.quantity.toFixed(2)}</td>
                             </tr>
                         ))
                     ) : (
