@@ -59,7 +59,7 @@ const Dashboard = () => {
         };
 
         const fetchInventory = async () => {
-            const response = await fetch(`/api/inventories/`);
+            const response = await fetch(`http://3.21.185.97:8000/api/inventories/`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
