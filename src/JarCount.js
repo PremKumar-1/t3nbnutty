@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import useWebSocket, { ReadyState } from 'use-websocket';
 import './JarCount.css';
 import Speedometer from './Speedometer';
 
@@ -16,21 +17,37 @@ const Dashboard = () => {
     const [inventory, setInventory] = useState([]);
     const [jarsPerHour, setJarsPerHour] = useState(0);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [jarCounts, inventoryData] = await Promise.all([
-                    fetchAllJarCounts(date), 
-                    fetchInventory()
-                ]);
+    // WebSocket URL
+    const socketUrl = `ws://3.21.185.97/ws/jarcounts/`;
 
-                processJarCounts(jarCounts);
-                setInventory(inventoryData);
-            } catch (error) {
-                console.error("Error fetching data:", error);
+    // Use the useWebSocket hook
+    const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+        onOpen: () => console.log('WebSocket connection established'),
+        onMessage: (event) => {
+            const data = JSON.parse(event.data);
+            if (data.message) {
+                fetchData();
             }
-        };
+        },
+        onError: (error) => console.error('WebSocket error:', error),
+        shouldReconnect: (closeEvent) => true, // Reconnect on close
+    });
 
+    const fetchData = async () => {
+        try {
+            const [jarCounts, inventoryData] = await Promise.all([
+                fetchAllJarCounts(date), 
+                fetchInventory()
+            ]);
+
+            processJarCounts(jarCounts);
+            setInventory(inventoryData);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+
+    useEffect(() => {
         // Initial fetch
         fetchData();
     }, [date]);
@@ -81,6 +98,14 @@ const Dashboard = () => {
     const handleDateChange = (e) => {
         setDate(e.target.value);
     };
+
+    const connectionStatus = {
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'Open',
+        [ReadyState.CLOSING]: 'Closing',
+        [ReadyState.CLOSED]: 'Closed',
+        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+    }[readyState];
 
     return (
         <div className="dashboard">
@@ -139,6 +164,7 @@ const Dashboard = () => {
                     )}
                 </tbody>
             </table>
+            <div>WebSocket connection status: {connectionStatus}</div>
         </div>
     );
 };
