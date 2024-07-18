@@ -81,8 +81,8 @@ const Dashboard = () => {
     };
 
     const processJarCounts = (jarCounts, setJarCount, setJarsPerHour) => {
-        const shift1 = jarCounts.filter(count => count.shift === 'day').length;
-        const shift2 = jarCounts.filter(count => count.shift === 'night').length;
+        const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
+        const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
         setJarCount({ shift1, shift2, total });
 
