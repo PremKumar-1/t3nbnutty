@@ -59,7 +59,7 @@ const Dashboard = () => {
         };
 
         const fetchInventory = async () => {
-            const response = await fetch(`/api/inventories/`);
+            const response = await fetch(`https://t3nbnutty.netlify.app/api/inventories/`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
