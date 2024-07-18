@@ -71,3 +71,7 @@ label {
 .data-table td.loading {
     opacity: 0.5;
 }
+
+.number-cell {
+    font-size: 1.5em; /* Adjust this value as needed */
+}

@@ -117,18 +117,19 @@ const Dashboard = () => {
                 <tbody>
                     <tr>
                         <td>Shift 1</td>
-                        <td>{jarCount.shift1}</td>
+                        <td className="number-cell">{jarCount.shift1}</td>
                     </tr>
                     <tr>
                         <td>Shift 2</td>
-                        <td>{jarCount.shift2}</td>
+                        <td className="number-cell">{jarCount.shift2}</td>
                     </tr>
                     <tr>
                         <td>Total</td>
-                        <td>{jarCount.total}</td>
+                        <td className="number-cell">{jarCount.total}</td>
                     </tr>
                 </tbody>
             </table>
+
             <h2>Inventory</h2>
             <table className="data-table">
                 <thead>
