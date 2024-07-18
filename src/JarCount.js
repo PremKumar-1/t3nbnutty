@@ -35,7 +35,8 @@ const Dashboard = () => {
 
         const fetchAllJarCounts = async () => {
             let jarCounts = [];
-            let nextPageUrl = `/api/jarcounts/?date=${date}`;
+            //let nextPageUrl = `/api/jarcounts/?date=${date}`;
+            let nextPageUrl = `/api/jarcounts/?`;
             console.log("Starting pagination fetch");
 
             while (nextPageUrl) {
