@@ -75,12 +75,11 @@ label {
     }
 
     .data-table th, .data-table td {
-        font-size: 14px;
         padding: 6px;
     }
 
     #number-cell {
-        font-size: 10em; /* Increase font size for mobile */
+        font-size: 5em; /* Increase font size for mobile */
     }
 }
 
