@@ -10,7 +10,7 @@ const ShiftSummary = () => {
     useEffect(() => {
         const fetchShiftData = async () => {
             try {
-                const response = await fetch(`http://3.129.44.247/api/jarcounts/`);
+                const response = await fetch(`/api/jarcounts/`);
                 const data = await response.json();
 
                 const currentShift = getCurrentShift();
