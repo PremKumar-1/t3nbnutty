@@ -17,6 +17,7 @@ const JarCount = () => {
     const [inventory, setInventory] = useState([]);
     const [jarsPerMinute, setJarsPerMinute] = useState(0);
     const [shiftData, setShiftData] = useState([]);
+    const [error, setError] = useState(null);
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
@@ -34,7 +35,7 @@ const JarCount = () => {
                 nextPageUrl = data.next ? (data.next.startsWith('http') ? data.next : `${baseUrl}${data.next}`) : null;
             } catch (error) {
                 console.error(`Error fetching page: ${nextPageUrl}`, error);
-                break;
+                throw error;
             }
         }
 
@@ -90,7 +91,9 @@ const JarCount = () => {
 
                 processJarCounts(jarCounts, setJarCount);
                 setInventory(inventoryData);
+                setError(null); // Clear any previous errors
             } catch (error) {
+                setError(error.message);
                 console.error("Error fetching data:", error);
             }
         };
@@ -168,6 +171,7 @@ const JarCount = () => {
                 </div>
                 <ShiftSummary selectedDate={date} shiftData={shiftData} />
             </div>
+            {error && <p className="error-message">Error: {error}</p>}
         </div>
     );
 };
