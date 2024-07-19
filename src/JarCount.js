@@ -16,6 +16,7 @@ const JarCount = () => {
     const [jarCount, setJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
     const [inventory, setInventory] = useState([]);
     const [jarsPerMinute, setJarsPerMinute] = useState(0);
+    const [shiftData, setShiftData] = useState([]);
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
@@ -75,6 +76,8 @@ const JarCount = () => {
             elapsedMinutes = Math.floor((now - startOfShift) / (1000 * 60));
             setJarsPerMinute((shift2 / elapsedMinutes) || 0);
         }
+
+        setShiftData(jarCounts);
     }, []);
 
     useEffect(() => {
@@ -163,7 +166,7 @@ const JarCount = () => {
                         </tbody>
                     </table>
                 </div>
-                <ShiftSummary selectedDate={date} />
+                <ShiftSummary selectedDate={date} shiftData={shiftData} />
             </div>
         </div>
     );

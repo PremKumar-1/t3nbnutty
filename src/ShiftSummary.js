@@ -3,106 +3,61 @@ import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 import './ShiftSummary.css';
 
-const ShiftSummary = ({ selectedDate }) => {
-    const [shiftData, setShiftData] = useState([]);
+const ShiftSummary = ({ selectedDate, shiftData }) => {
+    const [lineChartData, setLineChartData] = useState({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchShiftData = async () => {
-            try {
-                let jarCounts = [];
-                let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
-                const baseUrl = window.location.origin;
+        const processShiftData = () => {
+            const shift1Data = [];
+            const shift2Data = [];
 
-                while (nextPageUrl) {
-                    try {
-                        const response = await fetch(nextPageUrl.startsWith('http') ? nextPageUrl : baseUrl + nextPageUrl);
-                        if (!response.ok) {
-                            throw new Error(`Network response was not ok for URL: ${nextPageUrl}`);
-                        }
-                        const data = await response.json();
-                        jarCounts = jarCounts.concat(data.results);
-                        nextPageUrl = data.next ? (data.next.startsWith('http') ? data.next : `${baseUrl}${data.next}`) : null;
-                    } catch (error) {
-                        console.error(`Error fetching page: ${nextPageUrl}`, error);
-                        break;
-                    }
-                }
-
-                setShiftData(jarCounts);
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching shift data:", error);
+            for (let i = 0; i < 12; i++) {
+                shift1Data.push({ hour: 8 + i, count: 0 });
+                shift2Data.push({ hour: 20 + i, count: 0 });
             }
+
+            shiftData.forEach(item => {
+                const timestamp = new Date(item.timestamp);
+                const hour = timestamp.getHours();
+                if (hour >= 8 && hour < 20) {
+                    shift1Data[hour - 8].count += item.count;
+                } else {
+                    shift2Data[hour - 20].count += item.count;
+                }
+            });
+
+            const labels = shift1Data.map((_, index) => `Hour ${index + 1}`);
+            const shift1Counts = shift1Data.map(item => item.count);
+            const shift2Counts = shift2Data.map(item => item.count);
+
+            setLineChartData({
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Shift 1 (8 AM - 8 PM)',
+                        data: shift1Counts,
+                        borderColor: 'rgba(75,192,192,1)',
+                        backgroundColor: 'rgba(75,192,192,0.4)',
+                        fill: false,
+                        tension: 0.1,
+                    },
+                    {
+                        label: 'Shift 2 (8 PM - 8 AM)',
+                        data: shift2Counts,
+                        borderColor: 'rgba(192,75,75,1)',
+                        backgroundColor: 'rgba(192,75,75,0.4)',
+                        fill: false,
+                        tension: 0.1,
+                    }
+                ]
+            });
+
+            setLoading(false);
         };
 
-        fetchShiftData();
-    }, [selectedDate]);
-
-    const getCurrentShift = () => {
-        const now = new Date();
-        const hour = now.getHours();
-        let shift = '';
-        let shiftStartTime = '';
-
-        if (hour >= 8 && hour < 20) {
-            shift = 'day';
-            shiftStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
-        } else {
-            shift = 'night';
-            if (hour >= 20) {
-                shiftStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
-            } else {
-                shiftStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 20, 0, 0);
-            }
-        }
-
-        const date = shiftStartTime.toISOString().split('T')[0];
-        return { shift, shiftStartTime, date };
-    };
-
-    const calculateHourlyProductivity = () => {
-        const currentShift = getCurrentShift();
-        const hourlyProductivity = [];
-
-        const currentTime = new Date();
-        const elapsedTime = (currentTime - currentShift.shiftStartTime) / 1000 / 3600;
-
-        for (let i = 0; i < Math.ceil(elapsedTime); i++) {
-            const hourStart = new Date(currentShift.shiftStartTime);
-            hourStart.setHours(hourStart.getHours() + i);
-            const hourEnd = new Date(hourStart);
-            hourEnd.setHours(hourEnd.getHours() + 1);
-
-            const jarsThisHour = shiftData.reduce((acc, item) => {
-                const itemTime = new Date(item.timestamp);
-                if (itemTime >= hourStart && itemTime < hourEnd) {
-                    return acc + item.count;
-                }
-                return acc;
-            }, 0);
-
-            hourlyProductivity.push(jarsThisHour);
-        }
-
-        return hourlyProductivity;
-    };
-
-    const hourlyProductivity = calculateHourlyProductivity();
-
-    const lineChartData = {
-        labels: hourlyProductivity.map((_, index) => `Hour ${index + 1}`),
-        datasets: [
-            {
-                label: 'Jars per Hour',
-                data: hourlyProductivity,
-                fill: false,
-                borderColor: 'rgba(75,192,192,1)',
-                backgroundColor: 'rgba(75,192,192,0.4)',
-                tension: 0.1,
-            }
-        ]
-    };
+        processShiftData();
+    }, [shiftData]);
 
     const options = {
         scales: {
