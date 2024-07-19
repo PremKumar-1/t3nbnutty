@@ -28,16 +28,27 @@ const Speedometer = () => {
 
         const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
         const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
-        // const total = shift1 + shift2; // This line is commented out because 'total' is not used
 
         const now = new Date();
-        const startOfShift = now.getHours() >= 8 && now.getHours() < 20 ? new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0) : new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
-        const elapsedMinutes = Math.floor((now - startOfShift) / (1000 * 60));
-
         const currentHour = now.getHours();
-        let jarsPerMinute = currentHour >= 8 && currentHour < 20 ? shift1 / elapsedMinutes : shift2 / elapsedMinutes;
+        let startOfShift;
+        let elapsedMinutes;
 
-        setJarsPerMinute(isNaN(jarsPerMinute) ? 0 : jarsPerMinute);
+        if (currentHour >= 8 && currentHour < 20) {
+            // Day shift: 8 AM to 8 PM
+            startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
+            elapsedMinutes = Math.floor((now - startOfShift) / (1000 * 60));
+            setJarsPerMinute(shift1 / elapsedMinutes);
+        } else {
+            // Night shift: 8 PM to 8 AM next day
+            if (currentHour >= 20) {
+                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
+            } else {
+                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 20, 0, 0);
+            }
+            elapsedMinutes = Math.floor((now - startOfShift) / (1000 * 60));
+            setJarsPerMinute(shift2 / elapsedMinutes);
+        }
     };
 
     useEffect(() => {
@@ -51,9 +62,9 @@ const Speedometer = () => {
             <GaugeChart 
                 id="gauge-chart"
                 nrOfLevels={30}
-                percent={jarsPerMinute / 4000}
+                percent={jarsPerMinute / 100}  // Adjusted for larger scale
                 textColor="#000"
-                formatTextValue={(value) => `${value.toFixed(2)} Jars/hr`}
+                formatTextValue={(value) => `${value.toFixed(2)} Jars/min`}
                 colors={['#00FF00', '#FFDD00', '#FF0000']}
                 animate={true}
                 animDelay={0}

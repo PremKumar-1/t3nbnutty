@@ -1,17 +1,12 @@
 .speedometer {
-    margin: 20px auto;
-    width: 300px;
-    height: 300px;
+    margin: 40px auto;
+    width: 600px;
+    height: 600px;
 }
 
 .dashboard {
     padding: 20px;
     font-family: Arial, sans-serif;
-}
-
-h1, h2 {
-    margin-bottom: 20px;
-    color: #333;
     text-align: center;
 }
 
@@ -21,22 +16,33 @@ label {
     color: #333;
     display: block;
     margin-bottom: 10px;
-    text-align: center;
 }
 
 #date-picker {
     padding: 8px;
     margin-bottom: 20px;
-    display: block;
-    margin: auto;
     border: 1px solid #ccc;
     border-radius: 4px;
+    display: block;
+    margin: auto;
+}
+
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.tables {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -54,18 +60,18 @@ label {
 }
 
 .number-cell {
-    font-size: 3em; /* Default value for larger screens */
+    font-size: 1.5em;
 }
 
 @media (max-width: 1200px) {
     .number-cell {
-        font-size: 1.3em; /* Adjust this value as needed */
+        font-size: 1.3em;
     }
 }
 
 @media (max-width: 900px) {
     .number-cell {
-        font-size: 1.1em; /* Adjust this value as needed */
+        font-size: 1.1em;
     }
 }
 
@@ -78,15 +84,11 @@ label {
         padding: 6px;
     }
 
-    #number-cell {
-        font-size: 5em; /* Increase font size for mobile */
+    .number-cell {
+        font-size: 1.3em;
     }
-}
 
-.data-table td {
-    transition: all 0.3s ease-in-out;
-}
-
-.data-table td.loading {
-    opacity: 0.5;
+    .dashboard-content {
+        display: block;
+    }
 }

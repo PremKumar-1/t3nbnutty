@@ -91,54 +91,58 @@ const JarCount = () => {
                 value={date}
                 onChange={handleDateChange} 
             />
-            <ShiftSummary selectedDate={date} />
-            <h1>Main Room Jar Count (RITA)</h1>
-            <table className="data-table">
-                <thead>
-                    <tr>
-                        <th><h2>Shift</h2></th>
-                        <th><h2>Completed</h2></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td className="number-cell">Shift 1</td>
-                        <td className="number-cell">{jarCount.shift1}</td>
-                    </tr>
-                    <tr>
-                        <td className="number-cell">Shift 2</td>
-                        <td className="number-cell">{jarCount.shift2}</td>
-                    </tr>
-                    <tr>
-                        <td className="number-cell">Total</td>
-                        <td className="number-cell">{jarCount.total}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h1>Inventory</h1>
-            <table className="data-table">
-                <thead>
-                    <tr>
-                        <th><h2>Item</h2></th>
-                        <th><h2>Quantity</h2></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Array.isArray(inventory) && inventory.length > 0 ? (
-                        inventory.map((item, index) => (
-                            <tr key={index}>
-                                <td className="number-cell">{item.product_name ? item.product_name.trim() : 'Unknown'}</td>
-                                <td className="number-cell">{item.quantity.toFixed(2)}</td>
+            <div className="dashboard-content">
+                <div className="tables">
+                    <h1>Main Room Jar Count (RITA)</h1>
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th><h2>Shift</h2></th>
+                                <th><h2>Completed</h2></th>
                             </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="2">No inventory data available</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="number-cell">Shift 1</td>
+                                <td className="number-cell">{jarCount.shift1}</td>
+                            </tr>
+                            <tr>
+                                <td className="number-cell">Shift 2</td>
+                                <td className="number-cell">{jarCount.shift2}</td>
+                            </tr>
+                            <tr>
+                                <td className="number-cell">Total</td>
+                                <td className="number-cell">{jarCount.total}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h1>Inventory</h1>
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th><h2>Item</h2></th>
+                                <th><h2>Quantity</h2></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Array.isArray(inventory) && inventory.length > 0 ? (
+                                inventory.map((item, index) => (
+                                    <tr key={index}>
+                                        <td className="number-cell">{item.product_name ? item.product_name.trim() : 'Unknown'}</td>
+                                        <td className="number-cell">{item.quantity.toFixed(2)}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="2">No inventory data available</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                <ShiftSummary selectedDate={date} />
+            </div>
         </div>
     );
 };
