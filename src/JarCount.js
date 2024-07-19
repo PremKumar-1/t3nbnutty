@@ -50,19 +50,24 @@ const Dashboard = () => {
         return data.results;
     };
 
-    const calculateElapsedMinutesFrom8AM = () => {
+    const calculateElapsedMinutes = () => {
         const now = new Date();
-        const today8AM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
-        const minutesSince8AM = Math.floor((now - today8AM) / (1000 * 60));
+        const currentHour = now.getHours();
+        let startOfShift;
 
-        // If it's before 8 AM today, calculate minutes from 8 AM yesterday
-        if (minutesSince8AM < 0) {
-            const yesterday8AM = new Date(today8AM);
-            yesterday8AM.setDate(yesterday8AM.getDate() - 1);
-            return Math.floor((now - yesterday8AM) / (1000 * 60));
+        if (currentHour >= 8 && currentHour < 20) {
+            // Day shift: 8 AM to 8 PM
+            startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
+        } else {
+            // Night shift: 8 PM to 8 AM next day
+            if (currentHour >= 20) {
+                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
+            } else {
+                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 20, 0, 0);
+            }
         }
 
-        return minutesSince8AM;
+        return Math.floor((now - startOfShift) / (1000 * 60)); // Convert milliseconds to minutes
     };
 
     const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
@@ -71,8 +76,18 @@ const Dashboard = () => {
         const total = shift1 + shift2;
         setJarCount({ shift1, shift2, total });
 
-        const elapsedMinutes = calculateElapsedMinutesFrom8AM();
-        const jarsPerMinute = total / elapsedMinutes;
+        const elapsedMinutes = calculateElapsedMinutes();
+        const currentHour = new Date().getHours();
+        let jarsPerMinute;
+
+        if (currentHour >= 8 && currentHour < 20) {
+            // Day shift: calculate jars per minute for shift1
+            jarsPerMinute = shift1 / elapsedMinutes;
+        } else {
+            // Night shift: calculate jars per minute for shift2
+            jarsPerMinute = shift2 / elapsedMinutes;
+        }
+
         setJarsPerMinute(isNaN(jarsPerMinute) ? 0 : jarsPerMinute);
     }, []);
 
