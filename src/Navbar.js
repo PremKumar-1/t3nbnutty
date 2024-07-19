@@ -9,7 +9,6 @@ const Navbar = () => {
             <ul>
                 <li><Link to="/">Dashboard</Link></li>
                 <li><Link to="/input">Input Inventory</Link></li>
-                <li><Link to="/summary">Shift Summary</Link></li>
             </ul>
         </div>
     );

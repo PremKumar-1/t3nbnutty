@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import './JarCount.css';
 import Speedometer from './Speedometer';
+import ShiftSummary from './ShiftSummary';
 
-const Dashboard = () => {
+const JarCount = () => {
     const getCurrentDate = () => {
         const today = new Date();
         const year = today.getFullYear();
@@ -13,10 +14,7 @@ const Dashboard = () => {
 
     const [date, setDate] = useState(getCurrentDate());
     const [jarCount, setJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
-    const [tempJarCount, setTempJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
     const [inventory, setInventory] = useState([]);
-    const [tempInventory, setTempInventory] = useState([]);
-    const [jarsPerMinute, setJarsPerMinute] = useState(0);
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
@@ -50,76 +48,34 @@ const Dashboard = () => {
         return data.results;
     };
 
-    const calculateElapsedMinutes = () => {
-        const now = new Date();
-        const currentHour = now.getHours();
-        let startOfShift;
-
-        if (currentHour >= 8 && currentHour < 20) {
-            // Day shift: 8 AM to 8 PM
-            startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
-        } else {
-            // Night shift: 8 PM to 8 AM next day
-            if (currentHour >= 20) {
-                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
-            } else {
-                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 20, 0, 0);
-            }
-        }
-
-        return Math.floor((now - startOfShift) / (1000 * 60)); // Convert milliseconds to minutes
-    };
-
-    const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
+    const processJarCounts = useCallback((jarCounts, setJarCount) => {
         const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
         const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
         setJarCount({ shift1, shift2, total });
-
-        const elapsedMinutes = calculateElapsedMinutes();
-        const currentHour = new Date().getHours();
-        let jarsPerMinute;
-
-        if (currentHour >= 8 && currentHour < 20) {
-            // Day shift: calculate jars per minute for shift1
-            jarsPerMinute = shift1 / elapsedMinutes;
-        } else {
-            // Night shift: calculate jars per minute for shift2
-            jarsPerMinute = shift2 / elapsedMinutes;
-        }
-
-        setJarsPerMinute(isNaN(jarsPerMinute) ? 0 : jarsPerMinute);
     }, []);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [jarCounts, inventoryData] = await Promise.all([
-                    fetchAllJarCounts(date), 
+                    fetchAllJarCounts(date),
                     fetchInventory()
                 ]);
 
-                processJarCounts(jarCounts, setTempJarCount, setJarsPerMinute);
-                setTempInventory(inventoryData);
+                processJarCounts(jarCounts, setJarCount);
+                setInventory(inventoryData);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
 
-        // Initial fetch
         fetchData();
 
-        // Set interval for continuous fetching
-        const intervalId = setInterval(fetchData, 5000); // Fetch data every 5 seconds
+        const intervalId = setInterval(fetchData, 5000);
 
-        // Clear interval on component unmount
         return () => clearInterval(intervalId);
     }, [date, processJarCounts]);
-
-    useEffect(() => {
-        setJarCount(tempJarCount);
-        setInventory(tempInventory);
-    }, [tempJarCount, tempInventory]);
 
     const handleDateChange = (e) => {
         setDate(e.target.value);
@@ -127,6 +83,7 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard">
+            <Speedometer />
             <label htmlFor="date-picker">Select Date:</label>
             <input 
                 type="date" 
@@ -134,7 +91,7 @@ const Dashboard = () => {
                 value={date}
                 onChange={handleDateChange} 
             />
-            <Speedometer value={jarsPerMinute} />
+            <ShiftSummary selectedDate={date} />
             <h1>Main Room Jar Count (RITA)</h1>
             <table className="data-table">
                 <thead>
@@ -186,4 +143,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default JarCount;

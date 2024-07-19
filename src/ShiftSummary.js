@@ -3,20 +3,33 @@ import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 import './ShiftSummary.css';
 
-const ShiftSummary = () => {
+const ShiftSummary = ({ selectedDate }) => {
     const [shiftData, setShiftData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchShiftData = async () => {
             try {
-                const response = await fetch(`/api/jarcounts/`);
-                const data = await response.json();
+                let jarCounts = [];
+                let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
+                const baseUrl = window.location.origin;
 
-                const currentShift = getCurrentShift();
-                const shiftData = data.filter(item => item.date === currentShift.date && item.shift === currentShift.shift);
-                
-                setShiftData(shiftData);
+                while (nextPageUrl) {
+                    try {
+                        const response = await fetch(nextPageUrl.startsWith('http') ? nextPageUrl : baseUrl + nextPageUrl);
+                        if (!response.ok) {
+                            throw new Error(`Network response was not ok for URL: ${nextPageUrl}`);
+                        }
+                        const data = await response.json();
+                        jarCounts = jarCounts.concat(data.results);
+                        nextPageUrl = data.next ? (data.next.startsWith('http') ? data.next : `${baseUrl}${data.next}`) : null;
+                    } catch (error) {
+                        console.error(`Error fetching page: ${nextPageUrl}`, error);
+                        break;
+                    }
+                }
+
+                setShiftData(jarCounts);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching shift data:", error);
@@ -24,10 +37,7 @@ const ShiftSummary = () => {
         };
 
         fetchShiftData();
-
-        const intervalId = setInterval(fetchShiftData, 10000); // Fetch data every 10 seconds
-        return () => clearInterval(intervalId); // Clean up on unmount
-    }, []);
+    }, [selectedDate]);
 
     const getCurrentShift = () => {
         const now = new Date();
@@ -56,7 +66,7 @@ const ShiftSummary = () => {
         const hourlyProductivity = [];
 
         const currentTime = new Date();
-        const elapsedTime = (currentTime - currentShift.shiftStartTime) / 1000 / 3600; // Convert milliseconds to hours
+        const elapsedTime = (currentTime - currentShift.shiftStartTime) / 1000 / 3600;
 
         for (let i = 0; i < Math.ceil(elapsedTime); i++) {
             const hourStart = new Date(currentShift.shiftStartTime);
@@ -103,7 +113,7 @@ const ShiftSummary = () => {
                 ticks: {
                     stepSize: 500,
                     callback: function(value) {
-                        return value.toFixed(0); // Display values as integers
+                        return value.toFixed(0);
                     }
                 }
             }
