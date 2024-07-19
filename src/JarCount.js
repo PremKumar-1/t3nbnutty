@@ -15,6 +15,7 @@ const JarCount = () => {
     const [date, setDate] = useState(getCurrentDate());
     const [jarCount, setJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
     const [inventory, setInventory] = useState([]);
+    const [jarsPerMinute, setJarsPerMinute] = useState(0);
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
@@ -53,6 +54,27 @@ const JarCount = () => {
         const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
         setJarCount({ shift1, shift2, total });
+
+        const now = new Date();
+        const currentHour = now.getHours();
+        let startOfShift;
+        let elapsedMinutes;
+
+        if (currentHour >= 8 && currentHour < 20) {
+            // Day shift: 8 AM to 8 PM
+            startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
+            elapsedMinutes = Math.floor((now - startOfShift) / (1000 * 60));
+            setJarsPerMinute((shift1 / elapsedMinutes) || 0);
+        } else {
+            // Night shift: 8 PM to 8 AM next day
+            if (currentHour >= 20) {
+                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
+            } else {
+                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 20, 0, 0);
+            }
+            elapsedMinutes = Math.floor((now - startOfShift) / (1000 * 60));
+            setJarsPerMinute((shift2 / elapsedMinutes) || 0);
+        }
     }, []);
 
     useEffect(() => {
@@ -83,7 +105,7 @@ const JarCount = () => {
 
     return (
         <div className="dashboard">
-            <Speedometer />
+            <Speedometer jarsPerMinute={jarsPerMinute} />
             <label htmlFor="date-picker">Select Date:</label>
             <input 
                 type="date" 
