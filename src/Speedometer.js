@@ -28,7 +28,7 @@ const Speedometer = () => {
 
         const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
         const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
-        const total = shift1 + shift2;
+        // const total = shift1 + shift2; // This line is commented out because 'total' is not used
 
         const now = new Date();
         const startOfShift = now.getHours() >= 8 && now.getHours() < 20 ? new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0) : new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
