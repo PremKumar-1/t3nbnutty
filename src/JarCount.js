@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import './JarCount.css';
 import Speedometer from './Speedometer';
 
@@ -17,36 +17,6 @@ const Dashboard = () => {
     const [inventory, setInventory] = useState([]);
     const [tempInventory, setTempInventory] = useState([]);
     const [jarsPerMinute, setJarsPerMinute] = useState(0);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [jarCounts, inventoryData] = await Promise.all([
-                    fetchAllJarCounts(date), 
-                    fetchInventory()
-                ]);
-
-                processJarCounts(jarCounts, setTempJarCount, setJarsPerMinute);
-                setTempInventory(inventoryData);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        // Initial fetch
-        fetchData();
-
-        // Set interval for continuous fetching
-        const intervalId = setInterval(fetchData, 5000); // Fetch data every 5 seconds
-
-        // Clear interval on component unmount
-        return () => clearInterval(intervalId);
-    }, [date]);
-
-    useEffect(() => {
-        setJarCount(tempJarCount);
-        setInventory(tempInventory);
-    }, [tempJarCount, tempInventory]);
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
@@ -80,17 +50,6 @@ const Dashboard = () => {
         return data.results;
     };
 
-    const processJarCounts = (jarCounts, setJarCount, setJarsPerMinute) => {
-        const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
-        const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
-        const total = shift1 + shift2;
-        setJarCount({ shift1, shift2, total });
-
-        const elapsedMinutes = calculateElapsedMinutesFrom8AM();
-        const jarsPerMinute = total / elapsedMinutes;
-        setJarsPerMinute(isNaN(jarsPerMinute) ? 0 : jarsPerMinute);
-    };
-
     const calculateElapsedMinutesFrom8AM = () => {
         const now = new Date();
         const today8AM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
@@ -105,6 +64,47 @@ const Dashboard = () => {
 
         return minutesSince8AM;
     };
+
+    const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
+        const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
+        const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
+        const total = shift1 + shift2;
+        setJarCount({ shift1, shift2, total });
+
+        const elapsedMinutes = calculateElapsedMinutesFrom8AM();
+        const jarsPerMinute = total / elapsedMinutes;
+        setJarsPerMinute(isNaN(jarsPerMinute) ? 0 : jarsPerMinute);
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [jarCounts, inventoryData] = await Promise.all([
+                    fetchAllJarCounts(date), 
+                    fetchInventory()
+                ]);
+
+                processJarCounts(jarCounts, setTempJarCount, setJarsPerMinute);
+                setTempInventory(inventoryData);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        // Initial fetch
+        fetchData();
+
+        // Set interval for continuous fetching
+        const intervalId = setInterval(fetchData, 5000); // Fetch data every 5 seconds
+
+        // Clear interval on component unmount
+        return () => clearInterval(intervalId);
+    }, [date, processJarCounts]);
+
+    useEffect(() => {
+        setJarCount(tempJarCount);
+        setInventory(tempInventory);
+    }, [tempJarCount, tempInventory]);
 
     const handleDateChange = (e) => {
         setDate(e.target.value);
