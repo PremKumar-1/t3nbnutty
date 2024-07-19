@@ -1,7 +1,15 @@
 .speedometer {
-    margin: 40px auto;
-    width: 600px;
-    height: 600px;
+    margin: 20px auto; /* Adjusted margin for better spacing */
+    width: 90%;       /* Responsive width */
+    max-width: 600px; /* Max width to prevent it from being too large */
+    height: auto;     /* Responsive height */
+}
+
+@media (min-width: 768px) {
+    .speedometer {
+        width: 600px;  /* Fixed width for larger screens */
+        height: 600px; /* Fixed height for larger screens */
+    }
 }
 
 .dashboard {
