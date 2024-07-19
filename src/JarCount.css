@@ -1,5 +1,5 @@
 .speedometer {
-    margin: 20px auto; /* Adjusted margin for better spacing */
+    margin: 5px auto; /* Adjusted margin for better spacing */
     width: 90%;       /* Responsive width */
     max-width: 600px; /* Max width to prevent it from being too large */
     height: auto;     /* Responsive height */
