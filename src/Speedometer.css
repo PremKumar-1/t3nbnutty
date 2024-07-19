@@ -8,6 +8,6 @@
 @media (min-width: 768px) {
     .speedometer {
         width: 600px;  /* Fixed width for larger screens */
-        height: 600px; /* Fixed height for larger screens */
+        height: auto; /* Fixed height for larger screens */
     }
 }
