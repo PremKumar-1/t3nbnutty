@@ -16,7 +16,7 @@ const Dashboard = () => {
     const [tempJarCount, setTempJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
     const [inventory, setInventory] = useState([]);
     const [tempInventory, setTempInventory] = useState([]);
-    const [jarsPerHour, setJarsPerHour] = useState(0);
+    const [jarsPerMinute, setJarsPerMinute] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -26,7 +26,7 @@ const Dashboard = () => {
                     fetchInventory()
                 ]);
 
-                processJarCounts(jarCounts, setTempJarCount, setJarsPerHour);
+                processJarCounts(jarCounts, setTempJarCount, setJarsPerMinute);
                 setTempInventory(inventoryData);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -80,15 +80,30 @@ const Dashboard = () => {
         return data.results;
     };
 
-    const processJarCounts = (jarCounts, setJarCount, setJarsPerHour) => {
+    const processJarCounts = (jarCounts, setJarCount, setJarsPerMinute) => {
         const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
         const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
         setJarCount({ shift1, shift2, total });
 
-        const hoursWorked = 12;
-        const jarsPerHour = total / hoursWorked;
-        setJarsPerHour(isNaN(jarsPerHour) ? 0 : jarsPerHour);
+        const elapsedMinutes = calculateElapsedMinutesFrom8AM();
+        const jarsPerMinute = total / elapsedMinutes;
+        setJarsPerMinute(isNaN(jarsPerMinute) ? 0 : jarsPerMinute);
+    };
+
+    const calculateElapsedMinutesFrom8AM = () => {
+        const now = new Date();
+        const today8AM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
+        const minutesSince8AM = Math.floor((now - today8AM) / (1000 * 60));
+
+        // If it's before 8 AM today, calculate minutes from 8 AM yesterday
+        if (minutesSince8AM < 0) {
+            const yesterday8AM = new Date(today8AM);
+            yesterday8AM.setDate(yesterday8AM.getDate() - 1);
+            return Math.floor((now - yesterday8AM) / (1000 * 60));
+        }
+
+        return minutesSince8AM;
     };
 
     const handleDateChange = (e) => {
@@ -104,7 +119,7 @@ const Dashboard = () => {
                 value={date}
                 onChange={handleDateChange} 
             />
-            <Speedometer value={jarsPerHour} />
+            <Speedometer value={jarsPerMinute} />
             <h1>Main Room Jar Count (RITA)</h1>
             <table className="data-table">
                 <thead>
