@@ -1,2 +1,2 @@
-/api/jarcounts/* http://3.19.74.24/api/jarcounts/:splat 200
-/api/* http://3.21.185.97:8000/api/:splat 200
+/api/boxercounts/* http://3.19.74.24/api/jarcounts/:splat 200
+/api/jarcounts/* http://3.21.185.97:8000/api/jarcounts/:splat 200
