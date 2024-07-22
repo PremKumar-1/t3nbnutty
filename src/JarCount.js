@@ -44,7 +44,7 @@ const JarCount = () => {
     };
 
     const fetchBoxerCounts = async (selectedDate) => {
-        const response = await fetch(`/api/boxercounts/?date=${selectedDate}`);
+        const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
