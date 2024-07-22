@@ -99,4 +99,12 @@ label {
     .dashboard-content {
         display: block;
     }
+
+    .tables {
+        order: 1;
+    }
+
+    .shift-summary {
+        order: 2;
+    }
 }

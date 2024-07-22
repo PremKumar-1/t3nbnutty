@@ -14,6 +14,7 @@ const JarCount = () => {
 
     const [date, setDate] = useState(getCurrentDate());
     const [jarCount, setJarCount] = useState({ shift1: 0, shift2: 0, total: 0 });
+    const [boxerCount, setBoxerCount] = useState({ shift1: 0, shift2: 0, total: 0 });
     const [inventory, setInventory] = useState([]);
     const [jarsPerMinute, setJarsPerMinute] = useState(0);
     const [shiftData, setShiftData] = useState([]);
@@ -42,8 +43,17 @@ const JarCount = () => {
         return jarCounts;
     };
 
+    const fetchBoxerCounts = async (selectedDate) => {
+        const response = await fetch(`/api/jarcounts/?date=${selectedDate}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data.results;
+    };
+
     const fetchInventory = async () => {
-        const response = await fetch(`/api/inventories/`);
+        const response = await fetch('/api/inventories/');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -84,12 +94,14 @@ const JarCount = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [jarCounts, inventoryData] = await Promise.all([
+                const [jarCounts, boxerCounts, inventoryData] = await Promise.all([
                     fetchAllJarCounts(date),
+                    fetchBoxerCounts(date),
                     fetchInventory()
                 ]);
 
                 processJarCounts(jarCounts, setJarCount);
+                processJarCounts(boxerCounts, setBoxerCount);
                 setInventory(inventoryData);
                 setError(null); // Clear any previous errors
             } catch (error) {
@@ -109,6 +121,16 @@ const JarCount = () => {
         setDate(e.target.value);
     };
 
+    const calculateLoss = () => {
+        return {
+            shift1: jarCount.shift1 - boxerCount.shift1,
+            shift2: jarCount.shift2 - boxerCount.shift2,
+            total: jarCount.total - boxerCount.total
+        };
+    };
+
+    const loss = calculateLoss();
+
     return (
         <div className="dashboard">
             <Speedometer jarsPerMinute={jarsPerMinute} />
@@ -126,21 +148,49 @@ const JarCount = () => {
                         <thead>
                             <tr>
                                 <th><h2>Shift</h2></th>
-                                <th><h2>Completed</h2></th>
+                                <th><h2>Capper</h2></th>
+                                <th><h2>Boxer</h2></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td className="number-cell">Shift 1</td>
                                 <td className="number-cell">{jarCount.shift1}</td>
+                                <td className="number-cell">{boxerCount.shift1}</td>
                             </tr>
                             <tr>
                                 <td className="number-cell">Shift 2</td>
                                 <td className="number-cell">{jarCount.shift2}</td>
+                                <td className="number-cell">{boxerCount.shift2}</td>
                             </tr>
                             <tr>
                                 <td className="number-cell">Total</td>
                                 <td className="number-cell">{jarCount.total}</td>
+                                <td className="number-cell">{boxerCount.total}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h1>Loss</h1>
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th><h2>Shift</h2></th>
+                                <th><h2>Loss</h2></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="number-cell">Shift 1</td>
+                                <td className="number-cell">{loss.shift1}</td>
+                            </tr>
+                            <tr>
+                                <td className="number-cell">Shift 2</td>
+                                <td className="number-cell">{loss.shift2}</td>
+                            </tr>
+                            <tr>
+                                <td className="number-cell">Total</td>
+                                <td className="number-cell">{loss.total}</td>
                             </tr>
                         </tbody>
                     </table>
