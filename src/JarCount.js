@@ -123,9 +123,9 @@ const JarCount = () => {
 
     const calculateLoss = () => {
         return {
-            shift1: jarCount.shift1 - boxerCount.shift1,
-            shift2: jarCount.shift2 - boxerCount.shift2,
-            total: jarCount.total - boxerCount.total
+            shift1: boxerCount.shift1 - jarCount.shift1,
+            shift2: boxerCount.shift2 - jarCount.shift2,
+            total: boxerCount.total - jarCount.total
         };
     };
 
