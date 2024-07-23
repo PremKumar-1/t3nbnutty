@@ -77,9 +77,9 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
             y: {
                 beginAtZero: true,
                 min: 0,
-                max: 5000,
+                max: 1500,
                 ticks: {
-                    stepSize: 500,
+                    stepSize: 150,
                     callback: function(value) {
                         return value.toFixed(0);
                     }
