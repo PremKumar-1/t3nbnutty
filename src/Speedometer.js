@@ -7,7 +7,7 @@ const Speedometer = ({ jarsPerMinute }) => {
         <div className="speedometer">
             <GaugeChart 
                 id="gauge-chart"
-                nrOfLevels={30}
+                nrOfLevels={100}
                 percent={jarsPerMinute / 100}  // Adjusted for larger scale
                 textColor="#000"
                 formatTextValue={(value) => `${value.toFixed(2)} Jars/min`}
@@ -16,7 +16,7 @@ const Speedometer = ({ jarsPerMinute }) => {
                 animDelay={0}
                 needleColor="#464A4F"
                 needleBaseColor="#464A4F"
-                arcWidth={0.3}
+                arcWidth={0.1}
                 cornerRadius={2}
                 needleTransitionDuration={500}
                 needleTransition="easeQuadInOut"
