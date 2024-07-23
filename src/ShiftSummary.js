@@ -11,22 +11,30 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
     useEffect(() => {
         const processShiftData = () => {
             try {
-                const shift1Data = Array.from({ length: 12 }, (_, i) => ({ hour: 8 + i, count: 0 }));
-                const shift2Data = Array.from({ length: 12 }, (_, i) => ({ hour: 20 + i, count: 0 }));
+                const shift1Data = Array.from({ length: 48 }, (_, i) => ({ minute: 480 + i * 15, count: 0 }));
+                const shift2Data = Array.from({ length: 48 }, (_, i) => ({ minute: 1200 + i * 15, count: 0 }));
 
                 shiftData.forEach(item => {
                     const timestamp = new Date(item.timestamp);
-                    const hour = timestamp.getHours();
+                    const minuteOfDay = timestamp.getHours() * 60 + timestamp.getMinutes();
                     const count = item.count;
 
-                    if (hour >= 8 && hour < 20) {
-                        shift1Data[hour - 8].count += count;
+                    if (minuteOfDay >= 480 && minuteOfDay < 1200) {
+                        const index = Math.floor((minuteOfDay - 480) / 15);
+                        shift1Data[index].count += count;
                     } else {
-                        shift2Data[(hour - 20 + 24) % 24].count += count;
+                        const adjustedMinuteOfDay = minuteOfDay >= 1200 ? minuteOfDay : minuteOfDay + 1440;
+                        const index = Math.floor((adjustedMinuteOfDay - 1200) / 15);
+                        shift2Data[index].count += count;
                     }
                 });
 
-                const labels = Array.from({ length: 12 }, (_, i) => `Hour ${i + 1}`);
+                const labels = Array.from({ length: 48 }, (_, i) => {
+                    const hour = Math.floor((480 + i * 15) / 60);
+                    const minute = (480 + i * 15) % 60;
+                    return `${hour}:${minute.toString().padStart(2, '0')}`;
+                });
+
                 const shift1Counts = shift1Data.map(item => item.count);
                 const shift2Counts = shift2Data.map(item => item.count);
 
