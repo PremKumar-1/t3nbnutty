@@ -16,7 +16,7 @@ const Speedometer = ({ jarsPerMinute }) => {
                 animDelay={0}
                 needleColor="#464A4F"
                 needleBaseColor="#464A4F"
-                arcWidth={0.1}
+                arcWidth={0.3}
                 cornerRadius={2}
                 needleTransitionDuration={500}
                 needleTransition="easeQuadInOut"
