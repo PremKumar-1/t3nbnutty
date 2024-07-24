@@ -108,3 +108,30 @@ label {
         order: 2;
     }
 }
+
+.shift-timings {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.shift-timings label {
+    margin-right: 10px;
+}
+
+.shift-timings input {
+    margin-right: 10px;
+}
+
+.shift-timings button {
+    padding: 8px 16px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.shift-timings button:hover {
+    background-color: #45a049;
+}

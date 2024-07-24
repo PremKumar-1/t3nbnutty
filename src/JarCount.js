@@ -20,10 +20,19 @@ const JarCount = () => {
     const [jarsPerMinute, setJarsPerMinute] = useState(0);
     const [shiftData, setShiftData] = useState([]);
     const [error, setError] = useState(null);
+    const [shift1Start, setShift1Start] = useState('08:00');
+    const [shift2Start, setShift2Start] = useState('20:00');
+
+    const apiUrls = {
+        jarcounts: '/api/jarcounts/',
+        labelerCounts: '/service/jarcounts/',
+        boxerCounts: '/third/jarcounts/',
+        shiftTimings: ['/api/shifttimings/', '/service/shifttimings/', '/third/shifttimings/']
+    };
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
-        let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
+        let nextPageUrl = `${apiUrls.jarcounts}?date=${selectedDate}`;
         const baseUrl = window.location.origin;
 
         while (nextPageUrl) {
@@ -45,7 +54,7 @@ const JarCount = () => {
     };
 
     const fetchLabelerCounts = async (selectedDate) => {
-        const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
+        const response = await fetch(`${apiUrls.labelerCounts}?date=${selectedDate}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -54,7 +63,7 @@ const JarCount = () => {
     };
 
     const fetchBoxerCounts = async (selectedDate) => {
-        const response = await fetch(`/third/jarcounts/?date=${selectedDate}`);
+        const response = await fetch(`${apiUrls.boxerCounts}?date=${selectedDate}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -121,6 +130,21 @@ const JarCount = () => {
         setDate(e.target.value);
     };
 
+    const handleShiftTimingChange = async () => {
+        try {
+            await Promise.all(apiUrls.shiftTimings.map(url => 
+                fetch(url, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ shift1_start: shift1Start, shift2_start: shift2Start })
+                })
+            ));
+            alert("Shift timings updated successfully!");
+        } catch (error) {
+            alert("Failed to update shift timings: " + error.message);
+        }
+    };
+
     const calculateLoss = () => {
         return {
             Capper2Labeler: {
@@ -148,6 +172,25 @@ const JarCount = () => {
                 value={date}
                 onChange={handleDateChange} 
             />
+            <div className="shift-timings">
+                <label>
+                    Shift 1 Start:
+                    <input 
+                        type="time" 
+                        value={shift1Start} 
+                        onChange={(e) => setShift1Start(e.target.value)} 
+                    />
+                </label>
+                <label>
+                    Shift 2 Start:
+                    <input 
+                        type="time" 
+                        value={shift2Start} 
+                        onChange={(e) => setShift2Start(e.target.value)} 
+                    />
+                </label>
+                <button onClick={handleShiftTimingChange}>Update Shift Timings</button>
+            </div>
             <div className="dashboard-content">
                 <div className="tables">
                     <h1>Main Room Jar Count (RITA)</h1>
