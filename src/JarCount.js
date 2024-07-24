@@ -27,10 +27,10 @@ const JarCount = () => {
         jarcounts: '/api/jarcounts/',
         labelerCounts: '/service/jarcounts/',
         boxerCounts: '/third/jarcounts/',
-        shiftTimings: ['/api/shifttimings/', '/service/shifttimings/', '/third/shifttimings/']
+        shiftTimings: ['/api/shifttimings/1/', '/service/shifttimings/1/', '/third/shifttimings/1/']
     };
 
-    const fetchAllJarCounts = async (selectedDate) => {
+    const fetchAllJarCounts = useCallback(async (selectedDate) => {
         let jarCounts = [];
         let nextPageUrl = `${apiUrls.jarcounts}?date=${selectedDate}`;
         const baseUrl = window.location.origin;
@@ -51,25 +51,25 @@ const JarCount = () => {
         }
 
         return jarCounts;
-    };
+    }, [apiUrls.jarcounts]);
 
-    const fetchLabelerCounts = async (selectedDate) => {
+    const fetchLabelerCounts = useCallback(async (selectedDate) => {
         const response = await fetch(`${apiUrls.labelerCounts}?date=${selectedDate}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
         return data.results;
-    };
+    }, [apiUrls.labelerCounts]);
 
-    const fetchBoxerCounts = async (selectedDate) => {
+    const fetchBoxerCounts = useCallback(async (selectedDate) => {
         const response = await fetch(`${apiUrls.boxerCounts}?date=${selectedDate}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
         return data.results;
-    };
+    }, [apiUrls.boxerCounts]);
 
     const fetchInventory = async () => {
         const response = await fetch('/api/inventories/');
