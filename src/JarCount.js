@@ -54,7 +54,7 @@ const JarCount = () => {
     };
 
     const fetchBoxerCounts = async (selectedDate) => {
-        const response = await fetch(`http://18.222.127.37/third/jarcounts/?date=${selectedDate}`);
+        const response = await fetch(`/third/jarcounts/?date=${selectedDate}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
