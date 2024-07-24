@@ -137,7 +137,7 @@ const JarCount = () => {
                             <tr>
                                 <th><h2>Shift</h2></th>
                                 <th><h2>Capper</h2></th>
-                                <th><h2>Boxer</h2></th>
+                                <th><h2>Labeler</h2></th>
                             </tr>
                         </thead>
                         <tbody>
