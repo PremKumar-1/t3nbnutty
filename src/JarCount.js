@@ -61,33 +61,21 @@ const JarCount = () => {
         return data.results;
     };
 
-    const processJarCounts = useCallback((jarCounts, setJarCount) => {
+    const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
         const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
         const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
         setJarCount({ shift1, shift2, total });
 
         const now = new Date();
-        const currentHour = now.getHours();
-        let startOfShift;
-        let elapsedMinutes;
+        const previousMinuteTimestamp = new Date(now.getTime() - 60000);
 
-        if (currentHour >= 8 && currentHour < 20) {
-            // Day shift: 8 AM to 8 PM
-            startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
-            elapsedMinutes = Math.floor((now - startOfShift) / (1000 * 60));
-            setJarsPerMinute((shift1 / elapsedMinutes) || 0);
-        } else {
-            // Night shift: 8 PM to 8 AM next day
-            if (currentHour >= 20) {
-                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
-            } else {
-                startOfShift = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 20, 0, 0);
-            }
-            elapsedMinutes = Math.floor((now - startOfShift) / (1000 * 60));
-            setJarsPerMinute((shift2 / elapsedMinutes) || 0);
-        }
+        const previousMinuteCount = jarCounts.filter(count => {
+            const timestamp = new Date(count.timestamp);
+            return timestamp >= previousMinuteTimestamp && timestamp < now;
+        }).reduce((acc, count) => acc + count.count, 0);
 
+        setJarsPerMinute(previousMinuteCount);
         setShiftData(jarCounts);
     }, []);
 
@@ -100,8 +88,8 @@ const JarCount = () => {
                     fetchInventory()
                 ]);
 
-                processJarCounts(jarCounts, setJarCount);
-                processJarCounts(boxerCounts, setBoxerCount);
+                processJarCounts(jarCounts, setJarCount, setJarsPerMinute);
+                processJarCounts(boxerCounts, setBoxerCount, setJarsPerMinute);
                 setInventory(inventoryData);
                 setError(null); // Clear any previous errors
             } catch (error) {
@@ -149,7 +137,7 @@ const JarCount = () => {
                             <tr>
                                 <th><h2>Shift</h2></th>
                                 <th><h2>Capper</h2></th>
-                                <th><h2>Labeler</h2></th>
+                                <th><h2>Boxer</h2></th>
                             </tr>
                         </thead>
                         <tbody>

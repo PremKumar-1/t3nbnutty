@@ -7,7 +7,7 @@ const Speedometer = ({ jarsPerMinute }) => {
         <div className="speedometer">
             <GaugeChart 
                 id="gauge-chart"
-                nrOfLevels={100}
+                nrOfLevels={30}
                 percent={jarsPerMinute / 100}  // Adjusted for larger scale
                 textColor="#000"
                 formatTextValue={(value) => `${value.toFixed(2)} Jars/min`}
