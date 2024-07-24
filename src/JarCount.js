@@ -124,7 +124,7 @@ const JarCount = () => {
         const intervalId = setInterval(fetchData, 5000);
 
         return () => clearInterval(intervalId);
-    }, [date, processJarCounts]);
+    }, [date, processJarCounts, fetchAllJarCounts, fetchBoxerCounts, fetchLabelerCounts]);
 
     const handleDateChange = (e) => {
         setDate(e.target.value);
