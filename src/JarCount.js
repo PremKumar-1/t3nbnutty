@@ -29,7 +29,7 @@ const JarCount = () => {
 
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
-        let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
+        let nextPageUrl = '/api/jarcounts/?date=${selectedDate}';
         const baseUrl = window.location.origin;
 
         while (nextPageUrl) {
@@ -51,7 +51,7 @@ const JarCount = () => {
     };
 
     const fetchLabelerCounts = async (selectedDate) => {
-        const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
+        const response = await fetch('/service/jarcounts/?date=${selectedDate}');
         
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -61,7 +61,7 @@ const JarCount = () => {
     };
 
     const fetchBoxerCounts = async (selectedDate) => {
-        const response = await fetch(`/third/jarcounts/?date=${selectedDate}`);
+        const response = await fetch('/third/jarcounts/?date=${selectedDate}');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
