@@ -113,37 +113,37 @@ const JarCount = () => {
         setShiftData(jarCounts);
     }, []);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [jarCounts, labelerCounts, boxerCounts, inventoryData] = await Promise.all([
-                    fetchAllJarCounts(date),
-                    fetchLabelerCounts(date),
-                    fetchBoxerCounts(date),
-                    fetchInventory()
-                ]);
+    const fetchData = useCallback(async () => {
+        try {
+            const [jarCounts, labelerCounts, boxerCounts, inventoryData] = await Promise.all([
+                fetchAllJarCounts(date),
+                fetchLabelerCounts(date),
+                fetchBoxerCounts(date),
+                fetchInventory()
+            ]);
 
-                processJarCounts(jarCounts, setJarCount, setJarsPerMinute, shift1Start, shift2Start);
-                processJarCounts(labelerCounts, setLabelerCount, setJarsPerMinute, shift1Start, shift2Start);
-                processJarCounts(boxerCounts, setBoxerCount, setJarsPerMinute, shift1Start, shift2Start);
-                setInventory(inventoryData);
-                setError(null); // Clear any previous errors
-            } catch (error) {
-                setError(error.message);
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchData();
-
-        const intervalId = setInterval(fetchData, 5000);
-
-        return () => clearInterval(intervalId);
+            processJarCounts(jarCounts, setJarCount, setJarsPerMinute, shift1Start, shift2Start);
+            processJarCounts(labelerCounts, setLabelerCount, setJarsPerMinute, shift1Start, shift2Start);
+            processJarCounts(boxerCounts, setBoxerCount, setJarsPerMinute, shift1Start, shift2Start);
+            setInventory(inventoryData);
+            setError(null); // Clear any previous errors
+        } catch (error) {
+            setError(error.message);
+            console.error("Error fetching data:", error);
+        }
     }, [date, processJarCounts, shift1Start, shift2Start]);
 
     useEffect(() => {
         fetchShiftTimings(); // Fetch shift timings on component mount
     }, []);
+
+    useEffect(() => {
+        fetchData();
+
+        const intervalId = setInterval(fetchData, 5000);
+
+        return () => clearInterval(intervalId);
+    }, [date, fetchData]);
 
     const handleDateChange = (e) => {
         setDate(e.target.value);
@@ -159,6 +159,8 @@ const JarCount = () => {
                 })
             ));
             alert("Shift timings updated successfully!");
+            fetchShiftTimings(); // Refetch shift timings to ensure UI consistency
+            fetchData(); // Fetch data again to reflect new shift timings
         } catch (error) {
             alert("Failed to update shift timings: " + error.message);
         }
