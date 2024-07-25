@@ -79,8 +79,8 @@ const JarCount = () => {
     };
 
     const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
-        const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
-        const shift2 = jarCounts.filter(count => count.shift === 'night').reduce((acc, count) => acc + count.count, 0);
+        const shift1 = jarCounts.filter(count => new Date(count.timestamp).getHours() < 20).reduce((acc, count) => acc + count.count, 0);
+        const shift2 = jarCounts.filter(count => new Date(count.timestamp).getHours() >= 20).reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
         setJarCount({ shift1, shift2, total });
 
