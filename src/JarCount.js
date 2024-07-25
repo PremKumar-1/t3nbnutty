@@ -24,7 +24,7 @@ const JarCount = () => {
     const [shift2Start, setShift2Start] = useState('20:00');
 
     const apiUrls = {
-        shiftTimings: ['/api/shifttimings/', '/third/shift-timings/', '/service/shift-timings/']
+        shiftTimings: ['/api/shifttimings/1/', '/third/shift-timings/1/', '/service/shift-timings/1/']
     };
 
     const fetchAllJarCounts = async (selectedDate) => {
