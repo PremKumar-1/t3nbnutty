@@ -24,15 +24,11 @@ const JarCount = () => {
     const [shift2Start, setShift2Start] = useState('20:00');
 
     const apiUrls = {
-        jarcounts: '/api/jarcounts/',
-        labelerCounts: '/service/jarcounts/',
-        boxerCounts: '/third/jarcounts/',
         shiftTimings: ['/api/shifttimings/1/', '/service/shift-timings/1/', '/third/shift-timings/1/']
     };
 
-    const fetchAllJarCounts = async (selectedDate) => {
+    const fetchAllJarCounts = useCallback(async (selectedDate) => {
         let jarCounts = [];
-        //let nextPageUrl = `${apiUrls.jarcounts}?date=${selectedDate}`;
         let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
         const baseUrl = window.location.origin;
 
@@ -52,10 +48,9 @@ const JarCount = () => {
         }
 
         return jarCounts;
-    };
+    }, []);
 
-    const fetchLabelerCounts = async (selectedDate) => {
-        //const response = await fetch(`${apiUrls.labelerCounts}?date=${selectedDate}`);
+    const fetchLabelerCounts = useCallback(async (selectedDate) => {
         const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
         
         if (!response.ok) {
@@ -63,26 +58,25 @@ const JarCount = () => {
         }
         const data = await response.json();
         return data.results;
-    };
+    }, []);
 
-    const fetchBoxerCounts = async (selectedDate) => {
-        //const response = await fetch(`${apiUrls.boxerCounts}?date=${selectedDate}`);
+    const fetchBoxerCounts = useCallback(async (selectedDate) => {
         const response = await fetch(`/third/jarcounts/?date=${selectedDate}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
         return data.results;
-    };
+    }, []);
 
-    const fetchInventory = async () => {
+    const fetchInventory = useCallback(async () => {
         const response = await fetch('/api/inventories/');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
         return data.results;
-    };
+    }, []);
 
     const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
         const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
@@ -128,7 +122,7 @@ const JarCount = () => {
         const intervalId = setInterval(fetchData, 5000);
 
         return () => clearInterval(intervalId);
-    }, [date, processJarCounts, fetchAllJarCounts, fetchBoxerCounts, fetchLabelerCounts]);
+    }, [date, processJarCounts, fetchAllJarCounts, fetchBoxerCounts, fetchLabelerCounts, fetchInventory]);
 
     const handleDateChange = (e) => {
         setDate(e.target.value);
