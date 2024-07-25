@@ -7,67 +7,43 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
     const [lineChartData, setLineChartData] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [interval, setInterval] = useState(30); // Default interval in minutes
 
     useEffect(() => {
         const processShiftData = () => {
             try {
-                const shift1Data = Array.from({ length: 48 }, (_, i) => ({ minute: 480 + i * 15, count: 0 }));
-                const shift2Data = Array.from({ length: 48 }, (_, i) => ({ minute: 1200 + i * 15, count: 0 }));
+                const dataPoints = Array.from({ length: 24 * (60 / interval) }, (_, i) => ({
+                    minute: i * interval,
+                    count: 0
+                }));
 
                 shiftData.forEach(item => {
                     const timestamp = new Date(item.timestamp);
                     const minuteOfDay = timestamp.getHours() * 60 + timestamp.getMinutes();
                     const count = item.count;
-                    const shift1Start = new Date(timestamp);
-                    const shift2Start = new Date(timestamp);
 
-                    const [shift1Hour, shift1Minute] = item.shift1_start.split(':').map(Number);
-                    const [shift2Hour, shift2Minute] = item.shift2_start.split(':').map(Number);
-
-                    shift1Start.setHours(shift1Hour, shift1Minute, 0, 0);
-                    shift2Start.setHours(shift2Hour, shift2Minute, 0, 0);
-
-                    if (timestamp >= shift1Start && timestamp < shift2Start) {
-                        const index = Math.floor((minuteOfDay - shift1Start.getHours() * 60 - shift1Start.getMinutes()) / 15);
-                        if (index >= 0 && index < shift1Data.length) {
-                            shift1Data[index].count += count;
-                        }
-                    } else {
-                        const adjustedMinuteOfDay = minuteOfDay >= shift2Start.getHours() * 60 + shift2Start.getMinutes()
-                            ? minuteOfDay
-                            : minuteOfDay + 1440;
-                        const index = Math.floor((adjustedMinuteOfDay - shift2Start.getHours() * 60 - shift2Start.getMinutes()) / 15);
-                        if (index >= 0 && index < shift2Data.length) {
-                            shift2Data[index].count += count;
-                        }
+                    const index = Math.floor(minuteOfDay / interval);
+                    if (index >= 0 && index < dataPoints.length) {
+                        dataPoints[index].count += count;
                     }
                 });
 
-                const labels = Array.from({ length: 48 }, (_, i) => {
-                    const hour = Math.floor((480 + i * 15) / 60);
-                    const minute = (480 + i * 15) % 60;
-                    return `${hour}:${minute.toString().padStart(2, '0')}`;
+                const labels = dataPoints.map(item => {
+                    const hour = Math.floor(item.minute / 60);
+                    const minute = item.minute % 60;
+                    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
                 });
 
-                const shift1Counts = shift1Data.map(item => item.count);
-                const shift2Counts = shift2Data.map(item => item.count);
+                const counts = dataPoints.map(item => item.count);
 
                 setLineChartData({
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Shift 1',
-                            data: shift1Counts,
+                            label: 'Daily Data',
+                            data: counts,
                             borderColor: 'rgba(75,192,192,1)',
                             backgroundColor: 'rgba(75,192,192,0.4)',
-                            fill: false,
-                            tension: 0.1,
-                        },
-                        {
-                            label: 'Shift 2',
-                            data: shift2Counts,
-                            borderColor: 'rgba(192,75,75,1)',
-                            backgroundColor: 'rgba(192,75,75,0.4)',
                             fill: false,
                             tension: 0.1,
                         }
@@ -84,7 +60,7 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
         };
 
         processShiftData();
-    }, [shiftData]);
+    }, [shiftData, interval]);
 
     const options = {
         scales: {
@@ -104,7 +80,15 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
 
     return (
         <div className="shift-summary">
-            <h1>Current Shift Productivity</h1>
+            <h1>Daily Data Productivity</h1>
+            <div className="interval-selector">
+                <label htmlFor="interval">Select Interval:</label>
+                <select id="interval" value={interval} onChange={e => setInterval(Number(e.target.value))}>
+                    <option value={30}>30 Minutes</option>
+                    <option value={60}>1 Hour</option>
+                    <option value={120}>2 Hours</option>
+                </select>
+            </div>
             {loading ? (
                 <p>Loading...</p>
             ) : error ? (

@@ -9,6 +9,22 @@
     color: #333;
 }
 
+.shift-summary .interval-selector {
+    margin-bottom: 20px;
+}
+
+.shift-summary .interval-selector label {
+    margin-right: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.shift-summary .interval-selector select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 .shift-summary canvas {
     max-width: 100%;
     height: auto;
