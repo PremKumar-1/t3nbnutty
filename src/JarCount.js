@@ -30,7 +30,7 @@ const JarCount = () => {
         shiftTimings: ['/api/shifttimings/1/', '/service/shift-timings/1/', '/third/shift-timings/1/']
     };
 
-    const fetchAllJarCounts = useCallback(async (selectedDate) => {
+    const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
         //let nextPageUrl = `${apiUrls.jarcounts}?date=${selectedDate}`;
         let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
@@ -52,9 +52,9 @@ const JarCount = () => {
         }
 
         return jarCounts;
-    }, [apiUrls.jarcounts]);
+    };
 
-    const fetchLabelerCounts = useCallback(async (selectedDate) => {
+    const fetchLabelerCounts = async (selectedDate) => {
         //const response = await fetch(`${apiUrls.labelerCounts}?date=${selectedDate}`);
         const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
         
@@ -63,9 +63,9 @@ const JarCount = () => {
         }
         const data = await response.json();
         return data.results;
-    }, [apiUrls.labelerCounts]);
+    };
 
-    const fetchBoxerCounts = useCallback(async (selectedDate) => {
+    const fetchBoxerCounts = async (selectedDate) => {
         //const response = await fetch(`${apiUrls.boxerCounts}?date=${selectedDate}`);
         const response = await fetch(`/third/jarcounts/?date=${selectedDate}`);
         if (!response.ok) {
@@ -73,7 +73,7 @@ const JarCount = () => {
         }
         const data = await response.json();
         return data.results;
-    }, [apiUrls.boxerCounts]);
+    };
 
     const fetchInventory = async () => {
         const response = await fetch('/api/inventories/');
