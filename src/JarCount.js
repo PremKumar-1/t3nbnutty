@@ -92,42 +92,48 @@ const JarCount = () => {
         }
     };
 
-    const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute, shift1Start, shift2Start) => {
-        const shift1StartHour = parseInt(shift1Start.split(':')[0], 10);
-        const shift1StartMinute = parseInt(shift1Start.split(':')[1], 10);
-        const shift2StartHour = parseInt(shift2Start.split(':')[0], 10);
-        const shift2StartMinute = parseInt(shift2Start.split(':')[1], 10);
-
-        const shift1StartTime = new Date();
-        shift1StartTime.setHours(shift1StartHour, shift1StartMinute, 0, 0);
-
-        const shift2StartTime = new Date();
-        shift2StartTime.setHours(shift2StartHour, shift2StartMinute, 0, 0);
-
-        const shift1 = jarCounts.filter(count => {
+    const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
+        const shift1Counts = [];
+        const shift2Counts = [];
+    
+        jarCounts.forEach(count => {
             const timestamp = new Date(count.timestamp);
-            return timestamp >= shift1StartTime && timestamp < shift2StartTime;
-        }).reduce((acc, count) => acc + count.count, 0);
-
-        const shift2 = jarCounts.filter(count => {
-            const timestamp = new Date(count.timestamp);
-            return (timestamp >= shift2StartTime || timestamp < shift1StartTime);
-        }).reduce((acc, count) => acc + count.count, 0);
-
+            const shift1StartHour = parseInt(count.shift1_start.split(':')[0], 10);
+            const shift1StartMinute = parseInt(count.shift1_start.split(':')[1], 10);
+            const shift2StartHour = parseInt(count.shift2_start.split(':')[0], 10);
+            const shift2StartMinute = parseInt(count.shift2_start.split(':')[1], 10);
+    
+            const shift1StartTime = new Date(timestamp);
+            shift1StartTime.setHours(shift1StartHour, shift1StartMinute, 0, 0);
+    
+            const shift2StartTime = new Date(timestamp);
+            shift2StartTime.setHours(shift2StartHour, shift2StartMinute, 0, 0);
+    
+            if (timestamp >= shift1StartTime && timestamp < shift2StartTime) {
+                shift1Counts.push(count);
+            } else {
+                shift2Counts.push(count);
+            }
+        });
+    
+        const shift1 = shift1Counts.reduce((acc, count) => acc + count.count, 0);
+        const shift2 = shift2Counts.reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
+    
         setJarCount({ shift1, shift2, total });
-
+    
         const now = new Date();
         const previousMinuteTimestamp = new Date(now.getTime() - 60000);
-
+    
         const previousMinuteCount = jarCounts.filter(count => {
             const timestamp = new Date(count.timestamp);
             return timestamp >= previousMinuteTimestamp && timestamp < now;
         }).reduce((acc, count) => acc + count.count, 0);
-
+    
         setJarsPerMinute(previousMinuteCount);
         setShiftData(jarCounts);
     }, []);
+    
 
     const fetchData = useCallback(async () => {
         try {
