@@ -27,7 +27,7 @@ const JarCount = () => {
         shiftTimings: ['/api/shifttimings/1/', '/service/shift-timings/1/', '/third/shift-timings/1/']
     };
 
-    const fetchAllJarCounts = useCallback(async (selectedDate) => {
+    const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
         let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
         const baseUrl = window.location.origin;
@@ -48,9 +48,9 @@ const JarCount = () => {
         }
 
         return jarCounts;
-    }, []);
+    };
 
-    const fetchLabelerCounts = useCallback(async (selectedDate) => {
+    const fetchLabelerCounts = async (selectedDate) => {
         const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
         
         if (!response.ok) {
@@ -58,25 +58,25 @@ const JarCount = () => {
         }
         const data = await response.json();
         return data.results;
-    }, []);
+    };
 
-    const fetchBoxerCounts = useCallback(async (selectedDate) => {
+    const fetchBoxerCounts = async (selectedDate) => {
         const response = await fetch(`/third/jarcounts/?date=${selectedDate}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
         return data.results;
-    }, []);
+    };
 
-    const fetchInventory = useCallback(async () => {
+    const fetchInventory = async () => {
         const response = await fetch('/api/inventories/');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
         return data.results;
-    }, []);
+    };
 
     const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
         const shift1 = jarCounts.filter(count => count.shift === 'day').reduce((acc, count) => acc + count.count, 0);
@@ -122,7 +122,7 @@ const JarCount = () => {
         const intervalId = setInterval(fetchData, 5000);
 
         return () => clearInterval(intervalId);
-    }, [date, processJarCounts, fetchAllJarCounts, fetchBoxerCounts, fetchLabelerCounts, fetchInventory]);
+    }, [date, processJarCounts]);
 
     const handleDateChange = (e) => {
         setDate(e.target.value);
