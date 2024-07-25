@@ -18,14 +18,28 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
                     const timestamp = new Date(item.timestamp);
                     const minuteOfDay = timestamp.getHours() * 60 + timestamp.getMinutes();
                     const count = item.count;
+                    const shift1Start = new Date(timestamp);
+                    const shift2Start = new Date(timestamp);
 
-                    if (minuteOfDay >= 480 && minuteOfDay < 1200) {
-                        const index = Math.floor((minuteOfDay - 480) / 15);
-                        shift1Data[index].count += count;
+                    const [shift1Hour, shift1Minute] = item.shift1_start.split(':').map(Number);
+                    const [shift2Hour, shift2Minute] = item.shift2_start.split(':').map(Number);
+
+                    shift1Start.setHours(shift1Hour, shift1Minute, 0, 0);
+                    shift2Start.setHours(shift2Hour, shift2Minute, 0, 0);
+
+                    if (timestamp >= shift1Start && timestamp < shift2Start) {
+                        const index = Math.floor((minuteOfDay - shift1Start.getHours() * 60 - shift1Start.getMinutes()) / 15);
+                        if (index >= 0 && index < shift1Data.length) {
+                            shift1Data[index].count += count;
+                        }
                     } else {
-                        const adjustedMinuteOfDay = minuteOfDay >= 1200 ? minuteOfDay : minuteOfDay + 1440;
-                        const index = Math.floor((adjustedMinuteOfDay - 1200) / 15);
-                        shift2Data[index].count += count;
+                        const adjustedMinuteOfDay = minuteOfDay >= shift2Start.getHours() * 60 + shift2Start.getMinutes()
+                            ? minuteOfDay
+                            : minuteOfDay + 1440;
+                        const index = Math.floor((adjustedMinuteOfDay - shift2Start.getHours() * 60 - shift2Start.getMinutes()) / 15);
+                        if (index >= 0 && index < shift2Data.length) {
+                            shift2Data[index].count += count;
+                        }
                     }
                 });
 
@@ -42,7 +56,7 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Shift 1 (8 AM - 8 PM)',
+                            label: 'Shift 1',
                             data: shift1Counts,
                             borderColor: 'rgba(75,192,192,1)',
                             backgroundColor: 'rgba(75,192,192,0.4)',
@@ -50,7 +64,7 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
                             tension: 0.1,
                         },
                         {
-                            label: 'Shift 2 (8 PM - 8 AM)',
+                            label: 'Shift 2',
                             data: shift2Counts,
                             borderColor: 'rgba(192,75,75,1)',
                             backgroundColor: 'rgba(192,75,75,0.4)',
