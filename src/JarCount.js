@@ -94,16 +94,26 @@ const JarCount = () => {
 
     const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute, shift1Start, shift2Start) => {
         const shift1StartHour = parseInt(shift1Start.split(':')[0], 10);
+        const shift1StartMinute = parseInt(shift1Start.split(':')[1], 10);
         const shift2StartHour = parseInt(shift2Start.split(':')[0], 10);
+        const shift2StartMinute = parseInt(shift2Start.split(':')[1], 10);
+
+        const shift1StartTime = new Date();
+        shift1StartTime.setHours(shift1StartHour, shift1StartMinute, 0, 0);
+
+        const shift2StartTime = new Date();
+        shift2StartTime.setHours(shift2StartHour, shift2StartMinute, 0, 0);
 
         const shift1 = jarCounts.filter(count => {
-            const hour = new Date(count.timestamp).getHours();
-            return hour >= shift1StartHour && hour < shift2StartHour;
+            const timestamp = new Date(count.timestamp);
+            return timestamp >= shift1StartTime && timestamp < shift2StartTime;
         }).reduce((acc, count) => acc + count.count, 0);
+
         const shift2 = jarCounts.filter(count => {
-            const hour = new Date(count.timestamp).getHours();
-            return hour >= shift2StartHour || hour < shift1StartHour;
+            const timestamp = new Date(count.timestamp);
+            return (timestamp >= shift2StartTime || timestamp < shift1StartTime);
         }).reduce((acc, count) => acc + count.count, 0);
+
         const total = shift1 + shift2;
         setJarCount({ shift1, shift2, total });
 
