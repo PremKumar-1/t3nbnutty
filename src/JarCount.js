@@ -116,7 +116,6 @@ const JarCount = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                await fetchShiftTimings(); // Fetch shift timings before fetching jar counts
                 const [jarCounts, labelerCounts, boxerCounts, inventoryData] = await Promise.all([
                     fetchAllJarCounts(date),
                     fetchLabelerCounts(date),
@@ -140,7 +139,11 @@ const JarCount = () => {
         const intervalId = setInterval(fetchData, 5000);
 
         return () => clearInterval(intervalId);
-    }, [date, processJarCounts]);
+    }, [date, processJarCounts, shift1Start, shift2Start]);
+
+    useEffect(() => {
+        fetchShiftTimings(); // Fetch shift timings on component mount
+    }, []);
 
     const handleDateChange = (e) => {
         setDate(e.target.value);
