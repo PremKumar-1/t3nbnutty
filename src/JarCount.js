@@ -78,9 +78,26 @@ const JarCount = () => {
         return data.results;
     };
 
-    const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
-        const shift1 = jarCounts.filter(count => new Date(count.timestamp).getHours() < 20).reduce((acc, count) => acc + count.count, 0);
-        const shift2 = jarCounts.filter(count => new Date(count.timestamp).getHours() >= 20).reduce((acc, count) => acc + count.count, 0);
+    const fetchShiftTimings = async () => {
+        try {
+            const response = await fetch('/api/shifttimings/1/');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            setShift1Start(data.shift1_start.slice(0, 5));
+            setShift2Start(data.shift2_start.slice(0, 5));
+        } catch (error) {
+            console.error('Error fetching shift timings:', error);
+        }
+    };
+
+    const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute, shift1Start, shift2Start) => {
+        const shift1StartHour = parseInt(shift1Start.split(':')[0], 10);
+        const shift2StartHour = parseInt(shift2Start.split(':')[0], 10);
+
+        const shift1 = jarCounts.filter(count => new Date(count.timestamp).getHours() < shift2StartHour).reduce((acc, count) => acc + count.count, 0);
+        const shift2 = jarCounts.filter(count => new Date(count.timestamp).getHours() >= shift2StartHour).reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
         setJarCount({ shift1, shift2, total });
 
@@ -99,6 +116,7 @@ const JarCount = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                await fetchShiftTimings(); // Fetch shift timings before fetching jar counts
                 const [jarCounts, labelerCounts, boxerCounts, inventoryData] = await Promise.all([
                     fetchAllJarCounts(date),
                     fetchLabelerCounts(date),
@@ -106,9 +124,9 @@ const JarCount = () => {
                     fetchInventory()
                 ]);
 
-                processJarCounts(jarCounts, setJarCount, setJarsPerMinute);
-                processJarCounts(labelerCounts, setLabelerCount, setJarsPerMinute);
-                processJarCounts(boxerCounts, setBoxerCount, setJarsPerMinute);
+                processJarCounts(jarCounts, setJarCount, setJarsPerMinute, shift1Start, shift2Start);
+                processJarCounts(labelerCounts, setLabelerCount, setJarsPerMinute, shift1Start, shift2Start);
+                processJarCounts(boxerCounts, setBoxerCount, setJarsPerMinute, shift1Start, shift2Start);
                 setInventory(inventoryData);
                 setError(null); // Clear any previous errors
             } catch (error) {
@@ -122,7 +140,7 @@ const JarCount = () => {
         const intervalId = setInterval(fetchData, 5000);
 
         return () => clearInterval(intervalId);
-    }, [date, processJarCounts]);
+    }, [date, processJarCounts, shift1Start, shift2Start]);
 
     const handleDateChange = (e) => {
         setDate(e.target.value);
