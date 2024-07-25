@@ -27,7 +27,7 @@ const JarCount = () => {
         jarcounts: '/api/jarcounts/',
         labelerCounts: '/service/jarcounts/',
         boxerCounts: '/third/jarcounts/',
-        shiftTimings: ['/api/shift-timings/1/', '/service/shift-timings/1/', '/third/shift-timings/1/']
+        shiftTimings: ['/api/shifttimings/1/', '/service/shift-timings/1/', '/third/shift-timings/1/']
     };
 
     const fetchAllJarCounts = useCallback(async (selectedDate) => {
