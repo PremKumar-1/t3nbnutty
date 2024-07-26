@@ -54,7 +54,7 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'JarCounts',
+                            label: 'Capper',
                             data: jarCounts,
                             borderColor: 'rgba(75,192,192,1)',
                             backgroundColor: 'rgba(75,192,192,0.4)',
