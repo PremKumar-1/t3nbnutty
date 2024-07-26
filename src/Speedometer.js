@@ -10,7 +10,7 @@ const Speedometer = ({ jarsPerMinute, title }) => {
                 id="gauge-chart"
                 nrOfLevels={30}
                 percent={jarsPerMinute / 100}  // Adjusted for larger scale
-                textColor="#000"
+                textColor="#e5e5e5"
                 formatTextValue={(value) => `${value.toFixed(2)} Jars/min`}
                 colors={['#00FF00', '#FFDD00', '#FF0000']}
                 animate={true}

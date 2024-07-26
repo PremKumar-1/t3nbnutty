@@ -3,6 +3,14 @@
     width: 90%;       /* Responsive width */
     max-width: 600px; /* Max width to prevent it from being too large */
     height: auto;     /* Responsive height */
+    background-color: #1f4068;
+    border-radius: 10px;
+    padding: 20px;
+    color: #e5e5e5;
+}
+
+h3 {
+    color: #e5e5e5;
 }
 
 @media (min-width: 768px) {
