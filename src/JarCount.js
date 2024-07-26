@@ -22,6 +22,7 @@ const JarCount = () => {
     const [error, setError] = useState(null);
     const [shift1Start, setShift1Start] = useState('08:00');
     const [shift2Start, setShift2Start] = useState('20:00');
+    const [code, setCode] = useState('');
 
     const apiUrls = {
         shiftTimings: ['/api/shifttimings/1/', '/third/shift-timings/1/', '/service/shift-timings/1/']
@@ -29,27 +30,27 @@ const JarCount = () => {
 
     /*const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
-        let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
+        let nextPageUrl = /api/jarcounts/?date=${selectedDate};
         const baseUrl = window.location.origin;
 
         while (nextPageUrl) {
             try {
                 const response = await fetch(nextPageUrl.startsWith('http') ? nextPageUrl : baseUrl + nextPageUrl);
                 if (!response.ok) {
-                    throw new Error(`Network response was not ok for URL: ${nextPageUrl}`);
+                    throw new Error(Network response was not ok for URL: ${nextPageUrl});
                 }
                 const data = await response.json();
                 jarCounts = jarCounts.concat(data.results);
-                nextPageUrl = data.next ? (data.next.startsWith('http') ? data.next : `${baseUrl}${data.next}`) : null;
+                nextPageUrl = data.next ? (data.next.startsWith('http') ? data.next : ${baseUrl}${data.next}) : null;
             } catch (error) {
-                console.error(`Error fetching page: ${nextPageUrl}`, error);
+                console.error(Error fetching page: ${nextPageUrl}, error);
                 throw error;
             }
         }
 
         return jarCounts;
     };*/
-
+    
     const fetchAllJarCounts = async (selectedDate) => {
         const response = await fetch(`/api/jarcounts/?date=${selectedDate}`);
         
@@ -109,7 +110,6 @@ const JarCount = () => {
         jarCounts.forEach(count => {
             const timestamp = new Date(count.timestamp);
             
-            // Add nullish checks for shift start times
             const shift1StartTime = count.shift1_start ? count.shift1_start.split(':') : ['00', '00'];
             const shift2StartTime = count.shift2_start ? count.shift2_start.split(':') : ['00', '00'];
             
@@ -191,6 +191,11 @@ const JarCount = () => {
     };
 
     const handleShiftTimingChange = async () => {
+        if (code !== '052224') {
+            alert("Invalid code");
+            return;
+        }
+
         try {
             await Promise.all(apiUrls.shiftTimings.map(url => 
                 fetch(url, {
@@ -249,6 +254,14 @@ const JarCount = () => {
                         type="time" 
                         value={shift2Start} 
                         onChange={(e) => setShift2Start(e.target.value)} 
+                    />
+                </label>
+                <label>
+                    Code:
+                    <input 
+                        type="text" 
+                        value={code} 
+                        onChange={(e) => setCode(e.target.value)} 
                     />
                 </label>
                 <button onClick={handleShiftTimingChange}>Update Shift Timings</button>
