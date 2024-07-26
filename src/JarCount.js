@@ -27,7 +27,6 @@ const JarCount = () => {
         shiftTimings: ['/api/shifttimings/1/', '/third/shift-timings/1/', '/service/shift-timings/1/']
     };
 
-    
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
         let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
@@ -50,19 +49,6 @@ const JarCount = () => {
 
         return jarCounts;
     };
-    
-
-    /*
-    const fetchAllJarCounts = async (selectedDate) => {
-        const response = await fetch(`/api/jarcounts/?date=${selectedDate}`);
-        
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        return data.results;
-    };
-    */
 
     const fetchLabelerCounts = async (selectedDate) => {
         const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
@@ -112,42 +98,46 @@ const JarCount = () => {
     
         jarCounts.forEach(count => {
             const timestamp = new Date(count.timestamp);
-            const shift1StartHour = parseInt(count.shift1_start.split(':')[0], 10);
-            const shift1StartMinute = parseInt(count.shift1_start.split(':')[1], 10);
-            const shift2StartHour = parseInt(count.shift2_start.split(':')[0], 10);
-            const shift2StartMinute = parseInt(count.shift2_start.split(':')[1], 10);
-    
-            const shift1StartTime = new Date(timestamp);
-            shift1StartTime.setHours(shift1StartHour, shift1StartMinute, 0, 0);
-    
-            const shift2StartTime = new Date(timestamp);
-            shift2StartTime.setHours(shift2StartHour, shift2StartMinute, 0, 0);
-    
-            if (timestamp >= shift1StartTime && timestamp < shift2StartTime) {
+            
+            // Add nullish checks for shift start times
+            const shift1StartTime = count.shift1_start ? count.shift1_start.split(':') : ['00', '00'];
+            const shift2StartTime = count.shift2_start ? count.shift2_start.split(':') : ['00', '00'];
+            
+            const shift1StartHour = parseInt(shift1StartTime[0], 10);
+            const shift1StartMinute = parseInt(shift1StartTime[1], 10);
+            const shift2StartHour = parseInt(shift2StartTime[0], 10);
+            const shift2StartMinute = parseInt(shift2StartTime[1], 10);
+
+            const shift1StartDate = new Date(timestamp);
+            shift1StartDate.setHours(shift1StartHour, shift1StartMinute, 0, 0);
+
+            const shift2StartDate = new Date(timestamp);
+            shift2StartDate.setHours(shift2StartHour, shift2StartMinute, 0, 0);
+
+            if (timestamp >= shift1StartDate && timestamp < shift2StartDate) {
                 shift1Counts.push(count);
             } else {
                 shift2Counts.push(count);
             }
         });
-    
+
         const shift1 = shift1Counts.reduce((acc, count) => acc + count.count, 0);
         const shift2 = shift2Counts.reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
-    
+
         setJarCount({ shift1, shift2, total });
-    
+
         const now = new Date();
         const previousMinuteTimestamp = new Date(now.getTime() - 60000);
-    
+
         const previousMinuteCount = jarCounts.filter(count => {
             const timestamp = new Date(count.timestamp);
             return timestamp >= previousMinuteTimestamp && timestamp < now;
         }).reduce((acc, count) => acc + count.count, 0);
-    
+
         setJarsPerMinute(previousMinuteCount);
         setShiftData(jarCounts);
     }, []);
-    
 
     const fetchData = useCallback(async () => {
         try {
@@ -157,6 +147,11 @@ const JarCount = () => {
                 fetchBoxerCounts(date),
                 fetchInventory()
             ]);
+
+            console.log('Jar Counts:', jarCounts); // Debug log
+            console.log('Labeler Counts:', labelerCounts); // Debug log
+            console.log('Boxer Counts:', boxerCounts); // Debug log
+            console.log('Inventory:', inventoryData); // Debug log
 
             processJarCounts(jarCounts, setJarCount, setJarsPerMinute, shift1Start, shift2Start);
             processJarCounts(labelerCounts, setLabelerCount, setJarsPerMinute, shift1Start, shift2Start);
