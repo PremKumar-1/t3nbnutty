@@ -1,3 +1,9 @@
+.speedometers {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
 .speedometer {
     margin: 5px auto; /* Adjusted margin for better spacing */
     width: 90%;       /* Responsive width */
@@ -7,8 +13,7 @@
 
 @media (min-width: 768px) {
     .speedometer {
-        width: 600px;  /* Fixed width for larger screens */
-        height: 600px; /* Fixed height for larger screens */
+        width: 30%;  /* Width for larger screens */
     }
 }
 
@@ -46,6 +51,7 @@ label {
     font-weight: bold;
     color: #333;
 }
+
 .shift-timings input[type="time"],
 .shift-timings input[type="text"] {
     padding: 8px;
@@ -55,6 +61,7 @@ label {
     display: block;
     margin: auto;
 }
+
 .shift-timings button {
     padding: 8px 12px;
     margin-left: 10px;

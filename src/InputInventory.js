@@ -12,6 +12,7 @@ const InputInventory = () => {
         Soy: '',
         Peanuts: '',
     });
+    const [code, setCode] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,6 +24,12 @@ const InputInventory = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (code !== '052224') {
+            alert("Invalid code");
+            return;
+        }
+
         const formattedInventory = Object.keys(inventory).map(item => ({
             product_name: item,
             quantity: parseFloat(inventory[item])
@@ -77,6 +84,14 @@ const InputInventory = () => {
                         </label>
                     </div>
                 ))}
+                <label>
+                    Code:
+                    <input 
+                        type="text" 
+                        value={code} 
+                        onChange={(e) => setCode(e.target.value)} 
+                    />
+                </label>
                 <button type="submit">Submit</button>
             </form>
         </div>

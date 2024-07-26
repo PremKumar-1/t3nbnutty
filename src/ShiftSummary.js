@@ -14,7 +14,11 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
             try {
                 const dataPoints = Array.from({ length: 24 * (60 / interval) }, (_, i) => ({
                     minute: i * interval,
-                    count: 0
+                    counts: {
+                        jar: 0,
+                        labeler: 0,
+                        boxer: 0
+                    }
                 }));
 
                 shiftData.forEach(item => {
@@ -24,7 +28,13 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
 
                     const index = Math.floor(minuteOfDay / interval);
                     if (index >= 0 && index < dataPoints.length) {
-                        dataPoints[index].count += count;
+                        if (item.source === "jar") {
+                            dataPoints[index].counts.jar += count;
+                        } else if (item.source === "labeler") {
+                            dataPoints[index].counts.labeler += count;
+                        } else if (item.source === "boxer") {
+                            dataPoints[index].counts.boxer += count;
+                        }
                     }
                 });
 
@@ -34,16 +44,34 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
                     return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
                 });
 
-                const counts = dataPoints.map(item => item.count);
+                const jarCounts = dataPoints.map(item => item.counts.jar);
+                const labelerCounts = dataPoints.map(item => item.counts.labeler);
+                const boxerCounts = dataPoints.map(item => item.counts.boxer);
 
                 setLineChartData({
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Daily Data',
-                            data: counts,
+                            label: 'JarCounts',
+                            data: jarCounts,
                             borderColor: 'rgba(75,192,192,1)',
                             backgroundColor: 'rgba(75,192,192,0.4)',
+                            fill: false,
+                            tension: 0.1,
+                        },
+                        {
+                            label: 'Labeler',
+                            data: labelerCounts,
+                            borderColor: 'rgba(255,159,64,1)',
+                            backgroundColor: 'rgba(255,159,64,0.4)',
+                            fill: false,
+                            tension: 0.1,
+                        },
+                        {
+                            label: 'Boxer',
+                            data: boxerCounts,
+                            borderColor: 'rgba(153,102,255,1)',
+                            backgroundColor: 'rgba(153,102,255,0.4)',
                             fill: false,
                             tension: 0.1,
                         }

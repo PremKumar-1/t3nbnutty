@@ -2,9 +2,10 @@ import React from 'react';
 import GaugeChart from 'react-gauge-chart';
 import './Speedometer.css';
 
-const Speedometer = ({ jarsPerMinute }) => {
+const Speedometer = ({ jarsPerMinute, title }) => {
     return (
         <div className="speedometer">
+            <h3>{title}</h3>
             <GaugeChart 
                 id="gauge-chart"
                 nrOfLevels={30}

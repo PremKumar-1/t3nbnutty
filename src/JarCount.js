@@ -18,6 +18,8 @@ const JarCount = () => {
     const [boxerCount, setBoxerCount] = useState({ shift1: 0, shift2: 0, total: 0 });
     const [inventory, setInventory] = useState([]);
     const [jarsPerMinute, setJarsPerMinute] = useState(0);
+    const [labelerPerMinute, setLabelerPerMinute] = useState(0);
+    const [boxerPerMinute, setBoxerPerMinute] = useState(0);
     const [shiftData, setShiftData] = useState([]);
     const [error, setError] = useState(null);
     const [shift1Start, setShift1Start] = useState('08:00');
@@ -50,7 +52,7 @@ const JarCount = () => {
 
         return jarCounts;
     };*/
-    
+
     const fetchAllJarCounts = async (selectedDate) => {
         const response = await fetch(`/api/jarcounts/?date=${selectedDate}`);
         
@@ -103,7 +105,7 @@ const JarCount = () => {
         }
     };
 
-    const processJarCounts = useCallback((jarCounts, setJarCount, setJarsPerMinute) => {
+    const processJarCounts = useCallback((jarCounts, setCount, setPerMinute) => {
         const shift1Counts = [];
         const shift2Counts = [];
     
@@ -135,7 +137,7 @@ const JarCount = () => {
         const shift2 = shift2Counts.reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
 
-        setJarCount({ shift1, shift2, total });
+        setCount({ shift1, shift2, total });
 
         const now = new Date();
         const previousMinuteTimestamp = new Date(now.getTime() - 60000);
@@ -145,7 +147,7 @@ const JarCount = () => {
             return timestamp >= previousMinuteTimestamp && timestamp < now;
         }).reduce((acc, count) => acc + count.count, 0);
 
-        setJarsPerMinute(previousMinuteCount);
+        setPerMinute(previousMinuteCount);
         setShiftData(jarCounts);
     }, []);
 
@@ -164,8 +166,8 @@ const JarCount = () => {
             console.log('Inventory:', inventoryData); // Debug log
 
             processJarCounts(jarCounts, setJarCount, setJarsPerMinute, shift1Start, shift2Start);
-            processJarCounts(labelerCounts, setLabelerCount, setJarsPerMinute, shift1Start, shift2Start);
-            processJarCounts(boxerCounts, setBoxerCount, setJarsPerMinute, shift1Start, shift2Start);
+            processJarCounts(labelerCounts, setLabelerCount, setLabelerPerMinute, shift1Start, shift2Start);
+            processJarCounts(boxerCounts, setBoxerCount, setBoxerPerMinute, shift1Start, shift2Start);
             setInventory(inventoryData);
             setError(null); // Clear any previous errors
         } catch (error) {
@@ -231,7 +233,11 @@ const JarCount = () => {
 
     return (
         <div className="dashboard">
-            <Speedometer jarsPerMinute={jarsPerMinute} />
+            <div className="speedometers">
+                <Speedometer jarsPerMinute={jarsPerMinute} title="Capper" />
+                <Speedometer jarsPerMinute={labelerPerMinute} title="Labeler" />
+                <Speedometer jarsPerMinute={boxerPerMinute} title="Boxer" />
+            </div>
             <label htmlFor="date-picker">Select Date:</label>
             <input 
                 type="date" 
