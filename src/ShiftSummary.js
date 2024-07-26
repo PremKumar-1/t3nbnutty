@@ -21,6 +21,8 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
                     }
                 }));
 
+                console.log("Shift Data:", shiftData); // Debug log
+
                 shiftData.forEach(item => {
                     const timestamp = new Date(item.timestamp);
                     const minuteOfDay = timestamp.getHours() * 60 + timestamp.getMinutes();

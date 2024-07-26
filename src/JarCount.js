@@ -30,29 +30,6 @@ const JarCount = () => {
         shiftTimings: ['/api/shifttimings/1/', '/third/shift-timings/1/', '/service/shift-timings/1/']
     };
 
-    /*const fetchAllJarCounts = async (selectedDate) => {
-        let jarCounts = [];
-        let nextPageUrl = /api/jarcounts/?date=${selectedDate};
-        const baseUrl = window.location.origin;
-
-        while (nextPageUrl) {
-            try {
-                const response = await fetch(nextPageUrl.startsWith('http') ? nextPageUrl : baseUrl + nextPageUrl);
-                if (!response.ok) {
-                    throw new Error(Network response was not ok for URL: ${nextPageUrl});
-                }
-                const data = await response.json();
-                jarCounts = jarCounts.concat(data.results);
-                nextPageUrl = data.next ? (data.next.startsWith('http') ? data.next : ${baseUrl}${data.next}) : null;
-            } catch (error) {
-                console.error(Error fetching page: ${nextPageUrl}, error);
-                throw error;
-            }
-        }
-
-        return jarCounts;
-    };*/
-
     const fetchAllJarCounts = async (selectedDate) => {
         const response = await fetch(`/api/jarcounts/?date=${selectedDate}`);
         
@@ -60,7 +37,7 @@ const JarCount = () => {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        return data.results;
+        return data.results.map(item => ({ ...item, source: "jar" }));
     };
 
     const fetchLabelerCounts = async (selectedDate) => {
@@ -70,7 +47,7 @@ const JarCount = () => {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        return data.results;
+        return data.results.map(item => ({ ...item, source: "labeler" }));
     };
 
     const fetchBoxerCounts = async (selectedDate) => {
@@ -79,7 +56,7 @@ const JarCount = () => {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        return data.results;
+        return data.results.map(item => ({ ...item, source: "boxer" }));
     };
 
     const fetchInventory = async () => {
@@ -170,6 +147,15 @@ const JarCount = () => {
             processJarCounts(boxerCounts, setBoxerCount, setBoxerPerMinute, shift1Start, shift2Start);
             setInventory(inventoryData);
             setError(null); // Clear any previous errors
+
+            // Combine all counts into shiftData with source info
+            const allShiftData = [
+                ...jarCounts,
+                ...labelerCounts,
+                ...boxerCounts
+            ];
+            setShiftData(allShiftData);
+
         } catch (error) {
             setError(error.message);
             console.error("Error fetching data:", error);
