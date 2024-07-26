@@ -27,7 +27,7 @@ const JarCount = () => {
         shiftTimings: ['/api/shifttimings/1/', '/third/shift-timings/1/', '/service/shift-timings/1/']
     };
 
-    /*
+    
     const fetchAllJarCounts = async (selectedDate) => {
         let jarCounts = [];
         let nextPageUrl = `/api/jarcounts/?date=${selectedDate}`;
@@ -50,8 +50,9 @@ const JarCount = () => {
 
         return jarCounts;
     };
-    */
+    
 
+    /*
     const fetchAllJarCounts = async (selectedDate) => {
         const response = await fetch(`/api/jarcounts/?date=${selectedDate}`);
         
@@ -61,7 +62,7 @@ const JarCount = () => {
         const data = await response.json();
         return data.results;
     };
-
+    */
 
     const fetchLabelerCounts = async (selectedDate) => {
         const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
