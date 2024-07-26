@@ -9,7 +9,7 @@
     width: 90%;       /* Responsive width */
     max-width: 600px; /* Max width to prevent it from being too large */
     height: auto;     /* Responsive height */
-    background-color: #1f4068;
+    background-color: #e0eafc;
     border-radius: 10px;
     padding: 20px;
 }
@@ -26,7 +26,7 @@
 }
 
 .dashboard label, .shift-timings label {
-    color: #e5e5e5;
+    color: #333;
 }
 
 #date-picker {
@@ -34,8 +34,8 @@
     margin-bottom: 20px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    background-color: #282c34;
-    color: #e5e5e5;
+    background-color: #e0eafc;
+    color: #333;
 }
 
 .shift-timings {
@@ -45,8 +45,8 @@
 
 .shift-timings input[type="time"],
 .shift-timings input[type="text"] {
-    background-color: #282c34;
-    color: #e5e5e5;
+    background-color: #e0eafc;
+    color: #333;
     border: 1px solid #ccc;
     padding: 8px;
     margin-bottom: 10px;
@@ -71,21 +71,22 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    background-color: #162447;
-    color: #e5e5e5;
+    background-color: #e0eafc;
+    color: #333;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .data-table th, .data-table td {
-    border: 1px solid #1f4068;
+    border: 1px solid #ccc;
     padding: 8px;
     text-align: left;
 }
 
 .data-table th {
-    background-color: #1f4068;
+    background-color: #007bff;
+    color: #fff;
     font-weight: bold;
 }
 

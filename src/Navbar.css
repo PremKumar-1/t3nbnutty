@@ -1,6 +1,6 @@
 .navbar {
     width: 100%;
-    background-color: #f8f9fa;
+    background-color: #007bff;
     padding: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: fixed;
@@ -12,7 +12,7 @@
 .navbar h3 {
     display: inline-block;
     margin-right: 20px;
-    color: #333;
+    color: #fff;
 }
 
 .navbar ul {
@@ -29,7 +29,7 @@
 
 .navbar ul li a {
     text-decoration: none;
-    color: #007bff;
+    color: #fff;
     font-weight: bold;
     padding: 10px;
     border-radius: 4px;
@@ -37,6 +37,5 @@
 }
 
 .navbar ul li a:hover {
-    background-color: #007bff;
-    color: white;
+    background-color: #0056b3;
 }

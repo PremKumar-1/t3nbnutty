@@ -2,14 +2,14 @@
     padding: 20px;
     font-family: Arial, sans-serif;
     text-align: center;
-    background-color: #1f4068;
+    background-color: #e0eafc;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .shift-summary h1 {
     margin-bottom: 20px;
-    color: #e5e5e5;
+    color: #333;
 }
 
 .shift-summary .interval-selector {
@@ -19,15 +19,15 @@
 .shift-summary .interval-selector label {
     margin-right: 10px;
     font-weight: bold;
-    color: #e5e5e5;
+    color: #333;
 }
 
 .shift-summary .interval-selector select {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    background-color: #282c34;
-    color: #e5e5e5;
+    background-color: #e0eafc;
+    color: #333;
 }
 
 .shift-summary canvas {
