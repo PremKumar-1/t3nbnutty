@@ -92,14 +92,27 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
         processShiftData();
     }, [shiftData, interval]);
 
+    const calculateMaxYValue = (interval) => {
+        switch(interval) {
+            case 30:
+                return 2500;
+            case 60:
+                return 5000;
+            case 120:
+                return 10000;
+            default:
+                return 2500;
+        }
+    };
+
     const options = {
         scales: {
             y: {
                 beginAtZero: true,
                 min: 0,
-                max: 1500,
+                max: calculateMaxYValue(interval),
                 ticks: {
-                    stepSize: 150,
+                    stepSize: calculateMaxYValue(interval) / 10,
                     callback: function(value) {
                         return value.toFixed(0);
                     }
