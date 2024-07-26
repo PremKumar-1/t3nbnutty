@@ -1,6 +1,6 @@
 body {
-  background-color: #f0f4f8;
-  color: #333;
+  background-color: #1a1a2e;
+  color: #e5e5e5;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -30,18 +30,18 @@ padding-top: 60px; /* Adjust padding to prevent overlap with the fixed navbar */
 }
 
 .App-header {
-background-color: #e0eafc;
+background-color: #282c34;
 min-height: 100vh;
 display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
 font-size: calc(10px + 2vmin);
-color: #333;
+color: white;
 }
 
 .App-link {
-color: #007bff;
+color: #61dafb;
 }
 
 @keyframes App-logo-spin {
@@ -54,7 +54,7 @@ to {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #333;
+  color: #e5e5e5;
 }
 
 button {
@@ -72,8 +72,8 @@ button:hover {
 }
 
 input, select {
-  background-color: #e0eafc;
-  color: #333;
+  background-color: #282c34;
+  color: #e5e5e5;
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 4px;
@@ -84,6 +84,6 @@ input, select {
 label {
   display: block;
   font-weight: bold;
-  color: #333;
+  color: #e5e5e5;
   margin-bottom: 10px;
 }
