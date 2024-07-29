@@ -45,20 +45,20 @@ const JarCount = () => {
         return results;
     };
 
-    const fetchAllJarCounts = async (selectedDate) => {
+    const fetchAllJarCounts = useCallback(async (selectedDate) => {
         const data = await fetchAllPages(`/api/jarcounts/?date=${selectedDate}`);
         return data.map(item => ({ ...item, source: "jar" }));
-    };
+    }, []);
 
-    const fetchLabelerCounts = async (selectedDate) => {
+    const fetchLabelerCounts = useCallback(async (selectedDate) => {
         const data = await fetchAllPages(`/service/jarcounts/?date=${selectedDate}`);
         return data.map(item => ({ ...item, source: "labeler" }));
-    };
+    }, []);
 
-    const fetchBoxerCounts = async (selectedDate) => {
+    const fetchBoxerCounts = useCallback(async (selectedDate) => {
         const data = await fetchAllPages(`/third/jarcounts/?date=${selectedDate}`);
         return data.map(item => ({ ...item, source: "boxer" }));
-    };
+    }, []);
 
     const fetchInventory = async () => {
         const response = await fetch('/api/inventories/');
@@ -161,7 +161,7 @@ const JarCount = () => {
             setError(error.message);
             console.error("Error fetching data:", error);
         }
-    }, [date, processJarCounts, shift1Start, shift2Start]);
+    }, [date, fetchAllJarCounts, fetchBoxerCounts, fetchLabelerCounts, processJarCounts, shift1Start, shift2Start]);
 
     useEffect(() => {
         fetchShiftTimings(); // Fetch shift timings on component mount
