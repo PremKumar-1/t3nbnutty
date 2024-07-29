@@ -30,35 +30,35 @@ const JarCount = () => {
         shiftTimings: ['/api/shifttimings/1/', '/third/shift-timings/1/', '/service/shift-timings/1/']
     };
 
-    const fetchAllJarCounts = async (selectedDate) => {
-        const response = await fetch(`/api/jarcounts/?date=${selectedDate}`);
-        
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+    const fetchAllPages = async (url) => {
+        let results = [];
+        let nextPageUrl = url;
+        while (nextPageUrl) {
+            const response = await fetch(nextPageUrl);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            results = results.concat(data.results);
+            nextPageUrl = data.next;
         }
-        const data = await response.json();
-        return data.results.map(item => ({ ...item, source: "jar" }));
+        return results;
+    };
+
+    const fetchAllJarCounts = async (selectedDate) => {
+        const data = await fetchAllPages(`/api/jarcounts/?date=${selectedDate}`);
+        return data.map(item => ({ ...item, source: "jar" }));
     };
 
     const fetchLabelerCounts = async (selectedDate) => {
-        const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
-        
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        return data.results.map(item => ({ ...item, source: "labeler" }));
+        const data = await fetchAllPages(`/service/jarcounts/?date=${selectedDate}`);
+        return data.map(item => ({ ...item, source: "labeler" }));
     };
 
     const fetchBoxerCounts = async (selectedDate) => {
-        const response = await fetch(`/third/jarcounts/?date=${selectedDate}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        return data.results.map(item => ({ ...item, source: "boxer" }));
+        const data = await fetchAllPages(`/third/jarcounts/?date=${selectedDate}`);
+        return data.map(item => ({ ...item, source: "boxer" }));
     };
-    
 
     const fetchInventory = async () => {
         const response = await fetch('/api/inventories/');
@@ -86,13 +86,13 @@ const JarCount = () => {
     const processJarCounts = useCallback((jarCounts, setCount, setPerMinute) => {
         const shift1Counts = [];
         const shift2Counts = [];
-    
+
         jarCounts.forEach(count => {
             const timestamp = new Date(count.timestamp);
-            
+
             const shift1StartTime = count.shift1_start ? count.shift1_start.split(':') : ['00', '00'];
             const shift2StartTime = count.shift2_start ? count.shift2_start.split(':') : ['00', '00'];
-            
+
             const shift1StartHour = parseInt(shift1StartTime[0], 10);
             const shift1StartMinute = parseInt(shift1StartTime[1], 10);
             const shift2StartHour = parseInt(shift2StartTime[0], 10);
@@ -128,7 +128,7 @@ const JarCount = () => {
         setPerMinute(previousMinuteCount);
         setShiftData(jarCounts);
     }, []);
-    
+
     const fetchData = useCallback(async () => {
         try {
             const [jarCounts, labelerCounts, boxerCounts, inventoryData] = await Promise.all([
@@ -161,7 +161,7 @@ const JarCount = () => {
             setError(error.message);
             console.error("Error fetching data:", error);
         }
-    }, [date, processJarCounts, shift1Start, shift2Start]);  
+    }, [date, processJarCounts, shift1Start, shift2Start]);
 
     useEffect(() => {
         fetchShiftTimings(); // Fetch shift timings on component mount
