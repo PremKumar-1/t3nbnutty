@@ -31,7 +31,7 @@ const JarCount = () => {
     };
 
     const fetchAllJarCounts = async (selectedDate) => {
-        const response = await fetch(`/api/jarcounts/?date=${selectedDate}`);
+        const response = await fetch(`http://3.21.185.97:8000/api/jarcounts/?date=${selectedDate}`);
         
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -41,7 +41,7 @@ const JarCount = () => {
     };
 
     const fetchLabelerCounts = async (selectedDate) => {
-        const response = await fetch(`/service/jarcounts/?date=${selectedDate}`);
+        const response = await fetch(`http://3.19.74.24/service/jarcounts/?date=${selectedDate}`);
         
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -51,12 +51,11 @@ const JarCount = () => {
     };
 
     const fetchBoxerCounts = async (selectedDate) => {
-        const response = await fetch(`/third/jarcounts/?date=${selectedDate}`);
+        const response = await fetch(`http://18.222.127.37:8000/third/jarcounts/?date=${selectedDate}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log('Fetched Boxer Counts:', data.results); // Debug log
         return data.results.map(item => ({ ...item, source: "boxer" }));
     };
     
