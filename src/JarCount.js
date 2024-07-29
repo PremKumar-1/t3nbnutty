@@ -90,46 +90,49 @@ const JarCount = () => {
     
         jarCounts.forEach(count => {
             const timestamp = new Date(count.timestamp);
-            
-            const shift1StartTime = count.shift1_start ? count.shift1_start.split(':') : ['00', '00'];
-            const shift2StartTime = count.shift2_start ? count.shift2_start.split(':') : ['00', '00'];
-            
+    
+            const shift1StartTime = shift1Start.split(':');
+            const shift2StartTime = shift2Start.split(':');
             const shift1StartHour = parseInt(shift1StartTime[0], 10);
             const shift1StartMinute = parseInt(shift1StartTime[1], 10);
             const shift2StartHour = parseInt(shift2StartTime[0], 10);
             const shift2StartMinute = parseInt(shift2StartTime[1], 10);
-
+    
             const shift1StartDate = new Date(timestamp);
             shift1StartDate.setHours(shift1StartHour, shift1StartMinute, 0, 0);
-
+    
             const shift2StartDate = new Date(timestamp);
             shift2StartDate.setHours(shift2StartHour, shift2StartMinute, 0, 0);
-
+    
             if (timestamp >= shift1StartDate && timestamp < shift2StartDate) {
                 shift1Counts.push(count);
             } else {
                 shift2Counts.push(count);
             }
         });
-
+    
         const shift1 = shift1Counts.reduce((acc, count) => acc + count.count, 0);
         const shift2 = shift2Counts.reduce((acc, count) => acc + count.count, 0);
         const total = shift1 + shift2;
-
+    
+        console.log('Shift 1 Boxer Counts:', shift1Counts); // Debug log
+        console.log('Shift 2 Boxer Counts:', shift2Counts); // Debug log
+        console.log('Total Boxer Count:', total); // Debug log
+    
         setCount({ shift1, shift2, total });
-
+    
         const now = new Date();
         const previousMinuteTimestamp = new Date(now.getTime() - 60000);
-
+    
         const previousMinuteCount = jarCounts.filter(count => {
             const timestamp = new Date(count.timestamp);
             return timestamp >= previousMinuteTimestamp && timestamp < now;
         }).reduce((acc, count) => acc + count.count, 0);
-
+    
         setPerMinute(previousMinuteCount);
         setShiftData(jarCounts);
-    }, []);
-
+    }, [shift1Start, shift2Start]);
+    
     const fetchData = useCallback(async () => {
         try {
             const [jarCounts, labelerCounts, boxerCounts, inventoryData] = await Promise.all([
@@ -138,18 +141,18 @@ const JarCount = () => {
                 fetchBoxerCounts(date),
                 fetchInventory()
             ]);
-
+    
             console.log('Jar Counts:', jarCounts); // Debug log
             console.log('Labeler Counts:', labelerCounts); // Debug log
             console.log('Boxer Counts:', boxerCounts); // Debug log
             console.log('Inventory:', inventoryData); // Debug log
-
-            processJarCounts(jarCounts, setJarCount, setJarsPerMinute, shift1Start, shift2Start);
-            processJarCounts(labelerCounts, setLabelerCount, setLabelerPerMinute, shift1Start, shift2Start);
-            processJarCounts(boxerCounts, setBoxerCount, setBoxerPerMinute, shift1Start, shift2Start);
+    
+            processJarCounts(jarCounts, setJarCount, setJarsPerMinute);
+            processJarCounts(labelerCounts, setLabelerCount, setLabelerPerMinute);
+            processJarCounts(boxerCounts, setBoxerCount, setBoxerPerMinute); // Ensure this line is correct
             setInventory(inventoryData);
             setError(null); // Clear any previous errors
-
+    
             // Combine all counts into shiftData with source info
             const allShiftData = [
                 ...jarCounts,
@@ -157,12 +160,12 @@ const JarCount = () => {
                 ...boxerCounts
             ];
             setShiftData(allShiftData);
-
+    
         } catch (error) {
             setError(error.message);
             console.error("Error fetching data:", error);
         }
-    }, [date, processJarCounts, shift1Start, shift2Start]);
+    }, [date, processJarCounts, shift1Start, shift2Start]);    
 
     useEffect(() => {
         fetchShiftTimings(); // Fetch shift timings on component mount
