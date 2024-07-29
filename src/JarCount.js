@@ -56,8 +56,10 @@ const JarCount = () => {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
+        console.log('Fetched Boxer Counts:', data.results); // Debug log
         return data.results.map(item => ({ ...item, source: "boxer" }));
     };
+    
 
     const fetchInventory = async () => {
         const response = await fetch('/api/inventories/');
