@@ -24,11 +24,6 @@ const JarCount = () => {
     const [error, setError] = useState(null);
     const [shift1Start, setShift1Start] = useState('08:00');
     const [shift2Start, setShift2Start] = useState('20:00');
-    const [code, setCode] = useState('');
-
-    const apiUrls = {
-        shiftTimings: ['/api/shifttimings/1/', '/third/shift-timings/1/', '/service/shift-timings/1/']
-    };
 
     const fetchAllPages = async (url) => {
         let results = [];
@@ -69,7 +64,7 @@ const JarCount = () => {
         return data.results;
     };
 
-    const fetchShiftTimings = async () => {
+    const fetchShiftTimings = useCallback(async () => {
         try {
             const response = await fetch('/api/shifttimings/1/');
             if (!response.ok) {
@@ -99,7 +94,7 @@ const JarCount = () => {
         } catch (error) {
             console.error('Error fetching shift timings:', error);
         }
-    };
+    }, []);
 
     const processJarCounts = useCallback((jarCounts, setCount, setPerMinute) => {
         const shift1Counts = [];
@@ -183,7 +178,7 @@ const JarCount = () => {
 
     useEffect(() => {
         fetchShiftTimings(); // Fetch shift timings on component mount
-    }, []);
+    }, [fetchShiftTimings]);
 
     useEffect(() => {
         fetchData();
