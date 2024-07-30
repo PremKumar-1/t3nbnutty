@@ -78,6 +78,24 @@ const JarCount = () => {
             const data = await response.json();
             setShift1Start(data.shift1_start.slice(0, 5));
             setShift2Start(data.shift2_start.slice(0, 5));
+
+            // Set initial state based on current shift
+            const now = new Date();
+            const shift1Time = new Date(now);
+            const [shift1Hour, shift1Minute] = data.shift1_start.split(':').map(Number);
+            shift1Time.setHours(shift1Hour, shift1Minute, 0, 0);
+
+            const shift2Time = new Date(now);
+            const [shift2Hour, shift2Minute] = data.shift2_start.split(':').map(Number);
+            shift2Time.setHours(shift2Hour, shift2Minute, 0, 0);
+
+            if (now >= shift1Time && now < shift2Time) {
+                setDate(getCurrentDate());
+            } else {
+                const previousDate = new Date(now);
+                previousDate.setDate(now.getDate() - 1);
+                setDate(previousDate.toISOString().split('T')[0]);
+            }
         } catch (error) {
             console.error('Error fetching shift timings:', error);
         }
@@ -179,28 +197,6 @@ const JarCount = () => {
         setDate(e.target.value);
     };
 
-    const handleShiftTimingChange = async () => {
-        if (code !== '052224') {
-            alert("Invalid code");
-            return;
-        }
-
-        try {
-            await Promise.all(apiUrls.shiftTimings.map(url => 
-                fetch(url, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ shift1_start: shift1Start, shift2_start: shift2Start })
-                })
-            ));
-            alert("Shift timings updated successfully!");
-            fetchShiftTimings(); // Refetch shift timings to ensure UI consistency
-            fetchData(); // Fetch data again to reflect new shift timings
-        } catch (error) {
-            alert("Failed to update shift timings: " + error.message);
-        }
-    };
-
     const calculateLoss = () => {
         return {
             Capper2Labeler: {
@@ -232,33 +228,6 @@ const JarCount = () => {
                 value={date}
                 onChange={handleDateChange} 
             />
-            <div className="shift-timings">
-                <label>
-                    Shift 1 Start:
-                    <input 
-                        type="time" 
-                        value={shift1Start} 
-                        onChange={(e) => setShift1Start(e.target.value)} 
-                    />
-                </label>
-                <label>
-                    Shift 2 Start:
-                    <input 
-                        type="time" 
-                        value={shift2Start} 
-                        onChange={(e) => setShift2Start(e.target.value)} 
-                    />
-                </label>
-                <label>
-                    Code:
-                    <input 
-                        type="text" 
-                        value={code} 
-                        onChange={(e) => setCode(e.target.value)} 
-                    />
-                </label>
-                <button onClick={handleShiftTimingChange}>Update Shift Timings</button>
-            </div>
             <div className="dashboard-content">
                 <div className="tables">
                     <h1>Main Room Jar Count (RITA)</h1>
