@@ -34,7 +34,7 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
                 const shiftStartHour = shift1StartTime[0];
                 const shiftStartMinute = shift1StartTime[1];
 
-                const dataPoints = Array.from({ length: 24 * (60 / interval) }, (_, i) => ({
+                const dataPoints = Array.from({ length: 24 * (60 / interval) + 1 }, (_, i) => ({
                     minute: i * interval,
                     counts: {
                         jar: 0,
