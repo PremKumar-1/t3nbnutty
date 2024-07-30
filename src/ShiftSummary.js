@@ -8,10 +8,32 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [interval, setInterval] = useState(30); // Default interval in minutes
+    const [shift1Start, setShift1Start] = useState('08:00');
+
+    useEffect(() => {
+        const fetchShiftTimings = async () => {
+            try {
+                const response = await fetch('/api/shifttimings/1/');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setShift1Start(data.shift1_start.slice(0, 5));
+            } catch (error) {
+                console.error('Error fetching shift timings:', error);
+            }
+        };
+
+        fetchShiftTimings();
+    }, []);
 
     useEffect(() => {
         const processShiftData = () => {
             try {
+                const shift1StartTime = shift1Start.split(':').map(Number);
+                const shiftStartHour = shift1StartTime[0];
+                const shiftStartMinute = shift1StartTime[1];
+
                 const dataPoints = Array.from({ length: 24 * (60 / interval) }, (_, i) => ({
                     minute: i * interval,
                     counts: {
@@ -25,7 +47,7 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
 
                 shiftData.forEach(item => {
                     const timestamp = new Date(item.timestamp);
-                    const minuteOfDay = timestamp.getHours() * 60 + timestamp.getMinutes();
+                    const minuteOfDay = ((timestamp.getHours() - shiftStartHour) * 60 + (timestamp.getMinutes() - shiftStartMinute) + 24 * 60) % (24 * 60);
                     const count = item.count;
 
                     const index = Math.floor(minuteOfDay / interval);
@@ -41,8 +63,9 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
                 });
 
                 const labels = dataPoints.map(item => {
-                    const hour = Math.floor(item.minute / 60);
-                    const minute = item.minute % 60;
+                    const totalMinutes = shiftStartHour * 60 + shiftStartMinute + item.minute;
+                    const hour = Math.floor(totalMinutes / 60) % 24;
+                    const minute = totalMinutes % 60;
                     return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
                 });
 
@@ -90,7 +113,7 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
         };
 
         processShiftData();
-    }, [shiftData, interval]);
+    }, [shiftData, interval, shift1Start]);
 
     const calculateMaxYValue = (interval) => {
         switch(interval) {
@@ -107,11 +130,17 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
 
     const options = {
         scales: {
+            x: {
+                ticks: {
+                    color: '#ffffff'
+                }
+            },
             y: {
                 beginAtZero: true,
                 min: 0,
                 max: calculateMaxYValue(interval),
                 ticks: {
+                    color: '#ffffff',
                     stepSize: calculateMaxYValue(interval) / 10,
                     callback: function(value) {
                         return value.toFixed(0);
