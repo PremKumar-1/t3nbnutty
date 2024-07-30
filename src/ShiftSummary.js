@@ -118,13 +118,13 @@ const ShiftSummary = ({ selectedDate, shiftData }) => {
     const calculateMaxYValue = (interval) => {
         switch(interval) {
             case 30:
-                return 2500;
+                return 3600;
             case 60:
-                return 5000;
+                return 7200;
             case 120:
-                return 10000;
+                return 14400;
             default:
-                return 2500;
+                return 3600;
         }
     };
 
