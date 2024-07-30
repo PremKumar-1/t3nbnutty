@@ -21,10 +21,7 @@
 
 .navbar a {
     color: #e5e5e5;
-    text-decoration: none;
+    text-decoration: bold;
     font-size: 18px;
 }
 
-.navbar a:hover {
-    text-decoration: underline;
-}
